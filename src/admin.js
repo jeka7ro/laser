@@ -1940,6 +1940,93 @@ let currentReportsPeriod = 'all'; // 'all' | 'today' | 'weekend' | 'month'
 let currentReportsStatus = 'all'; // 'all' | 'confirmed' | 'pending'
 let currentReportsPackage = 'all'; // 'all' | 'fun' | 'vip' | 'sweet' | 'standard'
 
+function exportReportsToExcel() {
+  const bookings = getFilteredReportsBookings();
+  if (!bookings || bookings.length === 0) {
+    showAdminToast("Aucune reservation a exporter pour cette selection.", "error");
+    return;
+  }
+
+  const headers = [
+    'Nr Crt',
+    'N° Commande',
+    'Reference Dossier',
+    'Date de Reservation',
+    'Creneau Horaire',
+    'Statut',
+    'Validation Client',
+    'Formule',
+    'Arene',
+    'Table',
+    'Prenom Enfant',
+    'Age',
+    'Nom Client',
+    'Telephone',
+    'Email',
+    'Langue',
+    'Nombre Joueurs',
+    'Acompte Paye (€)',
+    'Solde Du (€)',
+    'Total TTC (€)',
+    'Options Extras',
+    'Date de Creation'
+  ];
+
+  const escapeCsv = (val) => {
+    if (val === null || val === undefined) return '""';
+    const str = String(val).replace(/"/g, '""');
+    return `"${str}"`;
+  };
+
+  const rows = bookings.map((b, idx) => {
+    const addonsStr = (b.addons && Array.isArray(b.addons))
+      ? b.addons.map(a => `${a.qty || 1}x ${a.name || a.id}`).join(' + ')
+      : 'Aucun';
+
+    return [
+      idx + 1,
+      b.orderNumber ? `N° ${String(b.orderNumber).padStart(3, '0')}` : '-',
+      b.id || '',
+      b.date || '',
+      b.time || '',
+      b.status === 'confirmed' ? 'Confirme' : (b.status === 'in_progress' ? 'En cours' : (b.status === 'completed' ? 'Termine' : 'En attente')),
+      b.clientConfirmedAt ? 'Oui (Portail)' : 'En attente',
+      b.packageName || b.packageId || '',
+      (b.arena || 'Jungle').toUpperCase(),
+      b.tableNumber ? `Table ${b.tableNumber}` : '-',
+      b.childName || '',
+      b.childAge || '',
+      b.customerName || '',
+      b.phone || '',
+      b.email || '',
+      (b.lang || 'fr').toUpperCase(),
+      b.players || 0,
+      (b.depositPaid || 0).toFixed(2),
+      (b.balanceDue || 0).toFixed(2),
+      (b.totalAmount || 0).toFixed(2),
+      addonsStr,
+      b.createdAt ? new Date(b.createdAt).toLocaleString('fr-BE') : ''
+    ].map(escapeCsv).join(';');
+  });
+
+  const csvContent = '\uFEFF' + [headers.map(escapeCsv).join(';'), ...rows].join('\r\n');
+  const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement('a');
+  link.setAttribute('href', url);
+  const periodSlug = currentReportsPeriod;
+  const statusSlug = currentReportsStatus !== 'all' ? `_${currentReportsStatus}` : '';
+  const pkgSlug = currentReportsPackage !== 'all' ? `_${currentReportsPackage}` : '';
+  const todayStr = new Date().toISOString().split('T')[0];
+  link.setAttribute('download', `LaserMagic_Rapport_${periodSlug}${statusSlug}${pkgSlug}_${todayStr}.csv`);
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+  URL.revokeObjectURL(url);
+
+  showAdminToast(`Export Excel genere avec succes (${bookings.length} reservations) !`, 'success');
+}
+
 function setupReportsPeriodFilter() {
   const periodPills = document.querySelectorAll('#reports-period-pills .pill-filter-btn');
   periodPills.forEach(btn => {
@@ -1955,10 +2042,7 @@ function setupReportsPeriodFilter() {
   const exportBtn = document.getElementById('btn-export-reports');
   if (exportBtn) {
     exportBtn.onclick = () => {
-      showAdminToast("Generation du rapport recapitulatif PDF & Excel...", "success");
-      setTimeout(() => {
-        window.print();
-      }, 500);
+      exportReportsToExcel();
     };
   }
 }

@@ -357,15 +357,17 @@
       <div class="reports-container">
         <!-- Reports Control Bar -->
         <div class="reports-control-bar">
-          <div>
-            <h2 style="font-size:1.4rem; font-weight:800; margin:0 0 4px 0;" data-i18n="reportsTitle">Tableau de Bord & Rapports Analytiques</h2>
-            <p style="color:var(--text-secondary); font-size:0.88rem; margin:0;" data-i18n="reportsSub">
-              Indicateurs en temps réel, fréquentation des arènes et répartition des formules de Laser Magic
-            </p>
+          <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:16px;">
+            <div>
+              <h2 style="font-size:1.4rem; font-weight:800; margin:0 0 4px 0;" data-i18n="reportsTitle">Tableau de Bord & Rapports Analytiques</h2>
+              <p style="color:var(--text-secondary); font-size:0.88rem; margin:0;" data-i18n="reportsSub">
+                Indicateurs en temps réel, fréquentation des arènes et répartition des formules de Laser Magic
+              </p>
+            </div>
           </div>
 
-          <div style="display:flex; align-items:center; gap:12px; flex-wrap:wrap;">
-            <!-- Segmented Pill Group (Matching user's Screenshot) -->
+          <div style="display:flex; align-items:center; justify-content:space-between; gap:16px; flex-wrap:wrap; padding-top:14px; border-top:1px solid var(--border-subtle);">
+            <!-- Segmented Pill Group (Filtrele spre stanga) -->
             <div class="segmented-pills-bar" id="reports-period-pills">
               <button type="button" class="pill-filter-btn active" data-period="all" data-i18n="periodAll">Tous (50)</button>
               <button type="button" class="pill-filter-btn" data-period="today" data-i18n="periodToday">Aujourd'hui (5)</button>
@@ -373,11 +375,13 @@
               <button type="button" class="pill-filter-btn" data-period="month" data-i18n="periodMonth">Ce Mois</button>
             </div>
 
-            <!-- Export Action Pill -->
-            <button type="button" class="btn-pill-action" id="btn-export-reports">
-              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-              <span data-i18n="exportReport">Exporter Rapport</span>
-            </button>
+            <!-- Action Buttons (Butoanele spre dreapta) -->
+            <div style="display:flex; align-items:center; gap:10px; margin-left:auto;">
+              <button type="button" class="btn-pill-action" id="btn-export-reports" title="Exporter les données filtrées en Excel (.csv UTF-8)">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                <span data-i18n="exportExcel">Exporter Excel</span>
+              </button>
+            </div>
           </div>
         </div>
 

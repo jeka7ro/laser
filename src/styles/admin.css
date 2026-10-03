@@ -1681,27 +1681,28 @@ body.admin-body {
   box-shadow: 0 2px 8px rgba(15, 23, 42, 0.1);
 }
 
-/* Red / Pink Action Pill Button */
+/* Excel Emerald Green Action Pill Button (Excel Brand Palette, NOT RED) */
 .btn-pill-action {
-  background: linear-gradient(135deg, #e11d48 0%, #be123c 100%);
+  background: linear-gradient(135deg, #10753f 0%, #15803d 100%);
   color: #ffffff;
   border-radius: var(--radius-full);
-  padding: 9px 22px;
+  padding: 8px 20px;
   font-weight: 700;
   font-size: 0.88rem;
-  border: none;
+  border: 1px solid rgba(255, 255, 255, 0.15);
   cursor: pointer;
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  box-shadow: 0 4px 14px rgba(225, 29, 72, 0.35);
+  box-shadow: 0 4px 14px rgba(16, 117, 63, 0.35);
   transition: all var(--transition-fast);
   font-family: var(--font-sans);
 }
 
 .btn-pill-action:hover {
+  background: linear-gradient(135deg, #15803d 0%, #16a34a 100%);
   transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(225, 29, 72, 0.5);
+  box-shadow: 0 6px 20px rgba(22, 163, 74, 0.5);
   filter: brightness(1.08);
 }
 
@@ -1714,12 +1715,10 @@ body.admin-body {
 
 .reports-control-bar {
   display: flex;
-  align-items: center;
-  justify-content: space-between;
+  flex-direction: column;
   gap: 16px;
-  flex-wrap: wrap;
   background: var(--bg-card);
-  padding: 18px 24px;
+  padding: 20px 24px;
   border-radius: 20px;
   border: 1px solid var(--border-subtle);
   box-shadow: var(--shadow-sm);
