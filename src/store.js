@@ -1443,8 +1443,13 @@ export function getCommConfig() {
     const stored = localStorage.getItem(COMM_CONFIG_KEY);
     if (stored) {
       const parsed = JSON.parse(stored);
-      if (parsed.email && !parsed.email.apiKey && envBrevoKey) {
-        parsed.email.apiKey = envBrevoKey;
+      if (parsed.email) {
+        if (envBrevoKey) {
+          parsed.email.apiKey = envBrevoKey;
+        }
+        if (!parsed.email.senderEmail || parsed.email.senderEmail === 'reservations@lasermagic.be') {
+          parsed.email.senderEmail = 'jeka7ro@gmail.com';
+        }
       }
       return parsed;
     }
