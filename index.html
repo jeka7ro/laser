@@ -1,0 +1,1527 @@
+<!DOCTYPE html>
+<html lang="fr" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Laser Magic - Back-Office Pro</title>
+  <script>
+    (function() {
+      try {
+        const saved = localStorage.getItem('laser_admin_theme') || 'light';
+        document.documentElement.setAttribute('data-theme', saved);
+      } catch(e) {}
+    })();
+  </script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="./src/styles/admin.css">
+</head>
+<body class="admin-body">
+
+  <div class="admin-layout">
+    <!-- LEFT SIDEBAR DASHBOARD -->
+    <aside class="admin-sidebar" id="admin-sidebar">
+      <!-- Sidebar Header / Logo & Brand (Matched to topbar height: 74px) -->
+      <div class="sidebar-header">
+        <div class="sidebar-brand">
+          <img src="https://cdn.prod.website-files.com/6a5dfddc421d6120331d50f5/6a732659b500bebf3241f2b9_Laser-Magic-Logo.png" alt="Laser Magic Logo" class="sidebar-logo" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' width=\'140\' height=\'34\' viewBox=\'0 0 140 34\'><text x=\'0\' y=\'24\' fill=\'%2300f0ff\' font-family=\'sans-serif\' font-weight=\'bold\' font-size=\'18\'>LASER MAGIC</text></svg>'">
+          <div class="sidebar-brand-text">
+            <span class="sidebar-title">Laser Magic</span>
+            <span class="sidebar-badge">BACK-OFFICE PRO</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Navigation Menu -->
+      <div class="sidebar-content">
+        <div class="sidebar-status-banner">
+          <div class="sidebar-status-pill">
+            <span class="pulse-dot"></span>
+            <span data-i18n="liveArenas">2 Arènes Actives</span>
+          </div>
+        </div>
+        <div class="sidebar-section-title" data-i18n="sidebarNavMain">NAVIGATION PRINCIPALE</div>
+        <nav class="sidebar-nav" aria-label="Menu principal">
+          <button type="button" class="sidebar-nav-item nav-item active" data-tab="reports">
+            <svg class="nav-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="7" height="9" x="3" y="3" rx="1"/><rect width="7" height="5" x="14" y="3" rx="1"/><rect width="7" height="9" x="14" y="12" rx="1"/><rect width="7" height="5" x="3" y="16" rx="1"/></svg>
+            <span class="nav-label" data-i18n="navDashboard">Tableau de Bord</span>
+          </button>
+
+          <button type="button" class="sidebar-nav-item nav-item" data-tab="timeline">
+            <svg class="nav-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+            <span class="nav-label" data-i18n="navTimeline">Planning Arènes</span>
+          </button>
+
+          <button type="button" class="sidebar-nav-item nav-item" data-tab="bookings">
+            <svg class="nav-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1" ry="1"/></svg>
+            <span class="nav-label" data-i18n="navBookings">Réservations</span>
+            <span class="nav-badge-pill" id="sidebar-bookings-count">5</span>
+          </button>
+
+          <button type="button" class="sidebar-nav-item nav-item" data-tab="clients">
+            <svg class="nav-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+            <span class="nav-label" data-i18n="navClients">Fichier Clients (CRM)</span>
+            <span class="nav-badge-pill" id="sidebar-clients-count">0</span>
+          </button>
+
+          <button type="button" class="sidebar-nav-item nav-item" data-tab="kitchen">
+            <svg class="nav-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 2v20"/><path d="M4 2v5a3 3 0 0 0 6 0V2"/><path d="M7 10v12"/><path d="M21 7V2h-3v5a3 3 0 0 0 3 3v12"/></svg>
+            <span class="nav-label" data-i18n="navKitchen">Fiche Accueil & Cuisine</span>
+          </button>
+
+          <!-- Direct Link to Client Portal -->
+          <a href="./confirm.html" target="_blank" class="sidebar-nav-item" id="nav-client-portal" style="text-decoration:none; display:flex; align-items:center; justify-content:space-between; margin-top:2px;">
+            <div style="display:flex; align-items:center; gap:12px;">
+              <svg class="nav-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--laser-cyan)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+              <span class="nav-label" data-i18n="sidebarClientPortal" style="color:var(--laser-cyan); font-weight:700;">Page Client (Live)</span>
+            </div>
+            <span class="badge" style="background:rgba(0,240,255,0.15); color:var(--laser-cyan); font-size:0.65rem; font-weight:800; padding:2px 6px;">PORTAIL</span>
+          </a>
+        </nav>
+
+        <div class="sidebar-section-title" style="margin-top:24px;" data-i18n="sidebarNavIntegrations">INTÉGRATIONS & API</div>
+        <nav class="sidebar-nav">
+          <button type="button" class="sidebar-nav-item nav-item" data-tab="embed">
+            <svg class="nav-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+            <span class="nav-label" data-i18n="navEmbed">Intégrations & API</span>
+            <span class="badge-pos-mini">WEBHOOKS</span>
+          </button>
+        </nav>
+      </div>
+
+      <!-- Sidebar Footer Controls -->
+      <div class="sidebar-footer">
+        <div class="sidebar-system-info">
+          <div class="sidebar-clock-row">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+            <span id="brussels-clock-val">Brussels: 18:35 CET</span>
+          </div>
+          <div class="sidebar-site-tag" data-i18n="sidebarLocationTag">Laser Magic · Vilvoorde (Bruxelles)</div>
+        </div>
+      </div>
+    </aside>
+
+    <!-- MAIN CONTENT WRAPPER -->
+    <div class="admin-content-wrap">
+      <!-- Clean Topbar Header with Language Selector & Theme Toggle -->
+      <header class="admin-topbar">
+        <div class="topbar-left">
+          <h1 class="topbar-page-title" id="topbar-title">Tableau de Bord</h1>
+          <p class="topbar-subtitle" id="topbar-sub">Indicateurs en temps réel, fréquentation des arènes et répartition du chiffre d'affaires</p>
+        </div>
+
+        <div class="topbar-right">
+          <!-- Client Portal Direct View Button -->
+          <a href="./confirm.html" target="_blank" class="btn btn-secondary btn-sm" id="btn-topbar-client-portal" style="text-decoration:none; display:inline-flex; align-items:center; gap:6px; font-weight:700; color:var(--laser-cyan); border-color:rgba(0,240,255,0.4); padding:6px 14px; border-radius:var(--radius-full); font-size:0.82rem;" title="Ouvrir la page que le client reçoit (confirmation et constitution des équipes)">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+            <span data-i18n="topbarClientPortal">Page Client (Portail)</span>
+          </a>
+
+          <div class="lang-selector">
+            <button type="button" class="lang-btn active" data-lang="fr" title="Français">
+              <svg class="flag-icon flag-fr" width="15" height="10" viewBox="0 0 3 2" style="border-radius:2px; flex-shrink:0; display:inline-block; vertical-align:middle; box-shadow:0 0 0 1px rgba(255,255,255,0.2); overflow:hidden;" aria-hidden="true"><rect width="1" height="2" fill="#002654"/><rect x="1" width="1" height="2" fill="#FFFFFF"/><rect x="2" width="1" height="2" fill="#CE1126"/></svg>
+              <span>FR</span>
+            </button>
+            <button type="button" class="lang-btn" data-lang="nl" title="Nederlands">
+              <svg class="flag-icon flag-nl" width="15" height="10" viewBox="0 0 3 2" style="border-radius:2px; flex-shrink:0; display:inline-block; vertical-align:middle; box-shadow:0 0 0 1px rgba(255,255,255,0.2); overflow:hidden;" aria-hidden="true"><rect width="3" height="0.67" fill="#AE1C28"/><rect y="0.67" width="3" height="0.66" fill="#FFFFFF"/><rect y="1.33" width="3" height="0.67" fill="#21468B"/></svg>
+              <span>NL</span>
+            </button>
+            <button type="button" class="lang-btn" data-lang="en" title="English">
+              <svg class="flag-icon flag-en" width="15" height="10" viewBox="0 0 60 30" style="border-radius:2px; flex-shrink:0; display:inline-block; vertical-align:middle; box-shadow:0 0 0 1px rgba(255,255,255,0.2); overflow:hidden;" aria-hidden="true"><rect width="60" height="30" fill="#012169"/><path d="M0,0 L60,30 M60,0 L0,30" stroke="#fff" stroke-width="6"/><path d="M0,0 L60,30 M60,0 L0,30" stroke="#C8102E" stroke-width="3"/><path d="M30,0 v30 M0,15 h60" stroke="#fff" stroke-width="10"/><path d="M30,0 v30 M0,15 h60" stroke="#C8102E" stroke-width="6"/></svg>
+              <span>EN</span>
+            </button>
+          </div>
+
+          <!-- Theme Switcher Icon -->
+          <button type="button" class="theme-toggle-btn theme-toggle-circle" id="btn-theme-toggle" title="Basculer Mode Lumineux / Sombre">
+            <svg class="theme-icon-sun" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+            <svg class="theme-icon-moon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+            <span id="theme-text-val" style="display:none;">Mode Lumineux</span>
+          </button>
+        </div>
+      </header>
+
+      <!-- Main Content Container -->
+      <main class="admin-main">
+
+    <!-- KPI Metric Cards Strip -->
+    <section class="kpi-grid">
+      <div class="kpi-card kpi-cyan">
+        <div class="kpi-icon-box">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/><path d="m9 16 2 2 4-4"/></svg>
+        </div>
+        <div class="kpi-info">
+          <span class="kpi-title" data-i18n="statTodayBookings">Réservations du Jour</span>
+          <span class="kpi-value" id="kpi-today-bookings">0</span>
+          <span class="kpi-sub" data-i18n="statArenasJunglePrison">Arènes Jungle & Prison</span>
+        </div>
+      </div>
+      <div class="kpi-card kpi-pink">
+        <div class="kpi-icon-box">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+        </div>
+        <div class="kpi-info">
+          <span class="kpi-title" data-i18n="statTotalPlayers">Joueurs Attendus</span>
+          <span class="kpi-value" id="kpi-today-players">0</span>
+          <span class="kpi-sub" data-i18n="capacityBadge">Capacité Max: 44 Joueurs</span>
+        </div>
+      </div>
+      <div class="kpi-card kpi-green">
+        <div class="kpi-icon-box">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="14" x="2" y="5" rx="2"/><line x1="2" x2="22" y1="10" y2="10"/></svg>
+        </div>
+        <div class="kpi-info">
+          <span class="kpi-title" data-i18n="statRevenueToday">Chiffre d'Affaires Prévu</span>
+          <span class="kpi-value" id="kpi-today-revenue">0 €</span>
+          <span class="kpi-sub" id="kpi-sub-revenue" data-i18n="kpiSubRevenue">Avances + Soldes sur place</span>
+        </div>
+      </div>
+      <div class="kpi-card kpi-amber">
+        <div class="kpi-icon-box">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+        </div>
+        <div class="kpi-info">
+          <span class="kpi-title" data-i18n="statPendingApprovals">À Valider</span>
+          <span class="kpi-value" id="kpi-pending-approvals">0</span>
+          <span class="kpi-sub" id="kpi-sub-pending" data-i18n="kpiPendingSub">En attente validation mail</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- TAB 1: Timeline Scheduler -->
+    <section class="tab-view" id="tab-timeline">
+      <div class="timeline-card">
+        <div class="timeline-header">
+          <div>
+            <h2 data-i18n="timelineTitle">Planning Opérationnel des Salles & Arènes</h2>
+            <p style="color:var(--text-secondary); font-size:0.9rem;" data-i18n="timelineSubtitle">
+              Vue en temps réel des créneaux dans les arènes Jungle, Prison, Minigolf et Tables d'anniversaire
+            </p>
+          </div>
+
+          <div style="display:flex; align-items:center; gap:12px; flex-wrap:wrap;">
+            <div class="timeline-date-control">
+              <button type="button" class="date-pick-btn" id="timeline-prev-date" title="Jour précédent">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+              </button>
+              <input type="date" id="timeline-date-picker" class="form-input timeline-date-input" aria-label="Choisir la date">
+              <button type="button" class="date-pick-btn" id="timeline-next-date" title="Jour suivant">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+              </button>
+            </div>
+            <button type="button" class="btn btn-primary btn-sm btn-open-quick-booking" onclick="window.openQuickBookingModal()" style="gap:6px;">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+              <span data-i18n="newBookingBtn">Nouvelle Réservation</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Gantt Scheduler Grid -->
+        <div class="timeline-wrapper">
+          <div class="timeline-grid" id="timeline-grid-body">
+            <!-- Injected via JavaScript -->
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- TAB 2: Bookings Master Table -->
+    <section class="tab-view" id="tab-bookings">
+      <div class="table-card">
+        <div class="table-toolbar">
+          <div class="search-box" style="position:relative;">
+            <span class="search-icon">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+            </span>
+            <input type="text" id="bookings-search-input" placeholder="Rechercher par nom, téléphone, réf..." data-i18n-placeholder="searchBookingsPlaceholder">
+            <span id="bookings-search-count" style="display:none; position:absolute; right:12px; top:50%; transform:translateY(-50%); background:var(--laser-cyan); color:#04070f; border-radius:var(--radius-full); padding:2px 8px; font-size:0.75rem; font-weight:800; white-space:nowrap;"></span>
+          </div>
+
+          <!-- Status Filters -->
+          <div class="filter-chips">
+            <button type="button" class="chip-btn active" data-filter="all" data-i18n="all">Tous</button>
+            <button type="button" class="chip-btn" data-filter="today" data-i18n="today">Aujourd'hui</button>
+            <button type="button" class="chip-btn" data-filter="weekend" data-i18n="periodWeekend">Ce Week-end</button>
+            <button type="button" class="chip-btn" data-filter="pending" data-i18n="statusPending">En attente</button>
+            <button type="button" class="chip-btn" data-filter="confirmed" data-i18n="statusConfirmed">Confirmé</button>
+            <button type="button" class="chip-btn" data-filter="in_progress" data-i18n="statusInProgress">En cours</button>
+            <button type="button" class="chip-btn" data-filter="completed" data-i18n="statusCompleted">Terminé</button>
+          </div>
+
+          <div style="display: flex; align-items: center; gap: 8px; margin-left: auto;">
+            <button type="button" class="btn btn-secondary btn-sm" onclick="window.exportToExcel(false)" title="Exporter les réservations en Excel (.csv UTF-8)" style="gap: 6px; color: var(--laser-green); border-color: rgba(0, 255, 136, 0.35); padding: 7px 14px;">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+              <span data-i18n="exportExcel">Exporter Excel</span>
+            </button>
+            <button type="button" class="btn btn-primary btn-sm btn-open-quick-booking" onclick="window.openQuickBookingModal()" style="gap: 6px;">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+              <span data-i18n="newBookingBtn">Nouvelle Réservation</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Bulk Actions Floating/Docked Bar (Appears when 1+ rows are selected) -->
+        <div id="bookings-bulk-bar" style="display: none; padding: 10px 20px; background: rgba(0, 240, 255, 0.08); border-top: 1px solid rgba(0, 240, 255, 0.25); border-bottom: 1px solid rgba(0, 240, 255, 0.25); align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px;">
+          <div style="display: flex; align-items: center; gap: 12px;">
+            <span class="badge" style="background: var(--laser-cyan); color: #04070f; font-weight: 800; font-size: 0.82rem; padding: 4px 10px;" id="bulk-selected-count">
+              0 sélectionnée(s)
+            </span>
+            <button type="button" class="btn btn-secondary btn-sm" onclick="window.clearBookingSelection()" style="padding: 4px 10px; font-size: 0.78rem;" data-i18n="deselectAll">
+              Désélectionner tout
+            </button>
+          </div>
+          <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+            <button type="button" class="btn btn-secondary btn-sm" onclick="window.bulkUpdateStatus('confirmed')" style="color: var(--laser-green); border-color: rgba(0, 255, 136, 0.35); padding: 5px 12px; gap: 6px;">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polyline points="20 6 9 17 4 12"/></svg>
+              <span data-i18n="bulkConfirm">Valider / Confirmer</span>
+            </button>
+            <button type="button" class="btn btn-secondary btn-sm" onclick="window.exportToExcel(true)" style="color: var(--laser-cyan); border-color: rgba(0, 240, 255, 0.35); padding: 5px 12px; gap: 6px;">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+              <span data-i18n="exportSelection">Exporter sélection</span>
+            </button>
+            <button type="button" class="btn btn-secondary btn-sm" onclick="window.bulkDeleteBookings()" style="color: var(--laser-red); border-color: rgba(239, 68, 68, 0.4); background: rgba(239, 68, 68, 0.1); padding: 5px 12px; gap: 6px;">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+              <span data-i18n="deleteSelection">Supprimer la sélection</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="data-table-wrap">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th style="width: 32px; text-align: center;">
+                  <input type="checkbox" id="bookings-select-all" title="Tout sélectionner" onchange="window.toggleSelectAllBookings(this.checked)" style="cursor: pointer; width: 15px; height: 15px; accent-color: var(--laser-cyan);">
+                </th>
+                <th style="width: 85px;" data-i18n="colOrder">N° Cde</th>
+                <th style="white-space: nowrap;" data-i18n="colDateTime">Date & Heure</th>
+                <th data-i18n="colPackage">Formule & Fêté</th>
+                <th data-i18n="colClient">Client Organisateur</th>
+                <th data-i18n="colStatus">Statut</th>
+                <th style="text-align: right; white-space: nowrap;" data-i18n="colTotal">Total & Solde</th>
+                <th style="text-align: center; width: 175px; white-space: nowrap;" data-i18n="colActions">Actions</th>
+              </tr>
+            </thead>
+            <tbody id="bookings-table-body">
+              <!-- Injected via JavaScript -->
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Table Pagination & Summary Totals Footer Bar -->
+        <div class="table-pagination-footer" id="bookings-table-footer" style="padding: 12px 20px; border-top: 1px solid var(--border-subtle); display: flex; align-items: center; justify-content: space-between; background: var(--bg-surface); border-bottom-left-radius: var(--radius-xl); border-bottom-right-radius: var(--radius-xl); flex-wrap: wrap; gap: 14px;">
+          <!-- Left: Page size selector & range -->
+          <div style="display: flex; align-items: center; gap: 14px; flex-wrap: wrap;">
+            <div style="display: flex; align-items: center; gap: 8px; font-size: 0.84rem; color: var(--text-secondary);">
+              <span data-i18n="rowsPerPage">Lignes par page :</span>
+              <select id="bookings-page-size" class="form-input" onchange="window.changeBookingsPageSize(this.value)" style="width: auto; padding: 4px 10px; font-size: 0.82rem; height: 32px; border-radius: var(--radius-md); font-weight: 700; background: var(--bg-card); cursor: pointer;">
+                <option value="10">10</option>
+                <option value="25" selected>25</option>
+                <option value="50">50</option>
+                <option value="100">100</option>
+                <option value="all">Tous</option>
+              </select>
+            </div>
+            <span id="bookings-pagination-range" style="font-size: 0.84rem; color: var(--text-secondary); border-left: 1px solid var(--border-subtle); padding-left: 14px;">
+              Affichage de 1 à 25 sur 50
+            </span>
+          </div>
+
+          <!-- Center: Pagination navigation (Previous / Page buttons / Next) -->
+          <div id="bookings-pagination-nav" style="display: flex; align-items: center; gap: 6px;">
+            <!-- Injected via JS -->
+          </div>
+
+          <!-- Right: Summary Totals -->
+          <div style="display: flex; align-items: center; gap: 16px; flex-wrap: wrap;">
+            <div style="font-size: 0.85rem; color: var(--text-secondary);">
+              <span data-i18n="totalRecords">Total enreg. :</span> <strong id="bookings-count-label" style="color: var(--text-white); font-weight: 800;">50</strong>
+            </div>
+            <div style="font-size: 0.88rem; color: var(--text-secondary);">
+              <span data-i18n="totalRevenue">CA :</span> <strong id="bookings-total-revenue-sum" style="color: var(--laser-cyan); font-weight: 800; font-size: 1.02rem;">0 €</strong>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- TAB: Modern Reports & Analytics Dashboard (Default First Page) -->
+    <section class="tab-view active" id="tab-reports">
+      <div class="reports-container">
+        <!-- Reports Control Bar -->
+        <div class="reports-control-bar">
+          <div>
+            <h2 style="font-size:1.4rem; font-weight:800; margin:0 0 4px 0;" data-i18n="reportsTitle">Tableau de Bord & Rapports Analytiques</h2>
+            <p style="color:var(--text-secondary); font-size:0.88rem; margin:0;" data-i18n="reportsSub">
+              Indicateurs en temps réel, fréquentation des arènes et répartition des formules de Laser Magic
+            </p>
+          </div>
+
+          <div style="display:flex; align-items:center; gap:12px; flex-wrap:wrap;">
+            <!-- Segmented Pill Group (Matching user's Screenshot) -->
+            <div class="segmented-pills-bar" id="reports-period-pills">
+              <button type="button" class="pill-filter-btn active" data-period="all" data-i18n="periodAll">Tous (50)</button>
+              <button type="button" class="pill-filter-btn" data-period="today" data-i18n="periodToday">Aujourd'hui (5)</button>
+              <button type="button" class="pill-filter-btn" data-period="weekend" data-i18n="periodWeekend">Ce Week-end (18)</button>
+              <button type="button" class="pill-filter-btn" data-period="month" data-i18n="periodMonth">Ce Mois</button>
+            </div>
+
+            <!-- Export Action Pill -->
+            <button type="button" class="btn-pill-action" id="btn-export-reports">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+              <span data-i18n="exportReport">Exporter Rapport</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Dynamic Reports Grid with 24px rounded cards -->
+        <div class="reports-grid" id="reports-grid-content">
+          <!-- Injected via JavaScript renderReportsView() -->
+        </div>
+      </div>
+    </section>
+
+    <!-- TAB 3: Kitchen & Group Prep -->
+    <section class="tab-view" id="tab-kitchen">
+      <div class="timeline-card" style="margin-bottom:20px;">
+        <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:16px;">
+          <div>
+            <h2 data-i18n="kitchenTitle">Fiche d'Accueil & Préparation Cuisine</h2>
+            <p style="color:var(--text-secondary); font-size:0.9rem;" data-i18n="kitchenSubtitle">
+              Détail des collations, commandes de gâteaux, allergies et composition des équipes
+            </p>
+          </div>
+          <div style="display:flex; align-items:center; gap:12px; flex-wrap:wrap;">
+            <button type="button" class="btn btn-secondary btn-sm" id="btn-print-table-qrs" onclick="window.openTableQrModal()" style="border-color:rgba(0,240,255,0.4); color:var(--laser-cyan); font-weight:700; display:inline-flex; align-items:center; gap:8px;">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+              <span>QR Codes Tables 1-8</span>
+            </button>
+            <button type="button" class="btn btn-primary btn-sm" id="btn-open-bar-pos-kitchen" onclick="window.openBarPos()" style="background:var(--laser-cyan); color:#04070f; font-weight:800; display:inline-flex; align-items:center; gap:8px; border:none; box-shadow:0 0 12px rgba(0,240,255,0.35);">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8h1a4 4 0 0 1 0 8h-1"/><path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"/><line x1="6" y1="1" x2="6" y2="4"/><line x1="10" y1="1" x2="10" y2="4"/><line x1="14" y1="1" x2="14" y2="4"/></svg>
+              <span data-i18n="kitchenBarPosBtn">Caisse Bar & Pizzas (Simulateur Ardoise)</span>
+            </button>
+            <input type="date" id="kitchen-date-picker" class="form-input timeline-date-input" aria-label="Date préparation cuisine">
+          </div>
+        </div>
+      </div>
+
+      <!-- Aggregated Food Counters -->
+      <div class="summary-cards-row">
+        <div class="prep-count-card">
+          <span class="prep-count-num" id="count-donuts">0</span>
+          <span class="prep-count-label" data-i18n="foodDonuts">Mini Donuts (Lots)</span>
+        </div>
+        <div class="prep-count-card">
+          <span class="prep-count-num" id="count-fries" style="color:var(--laser-pink);">0</span>
+          <span class="prep-count-label" data-i18n="foodFriesFricadelle">Portions Frites & Fricadelle</span>
+        </div>
+        <div class="prep-count-card">
+          <span class="prep-count-num" id="count-vip" style="color:var(--laser-amber);">0</span>
+          <span class="prep-count-label" data-i18n="foodVipMeals">Menus VIP (Tenders)</span>
+        </div>
+        <div class="prep-count-card">
+          <span class="prep-count-num" id="count-cakes" style="color:#f43f5e;">0</span>
+          <span class="prep-count-label" data-i18n="foodCakes">Gâteaux Chocolat</span>
+        </div>
+        <div class="prep-count-card">
+          <span class="prep-count-num" id="count-arcade" style="color:var(--laser-green);">0</span>
+          <span class="prep-count-label" data-i18n="foodArcadeTokens">Jetons Arcade</span>
+        </div>
+        <div class="prep-count-card">
+          <span class="prep-count-num" id="count-champagne" style="color:#38bdf8;">0</span>
+          <span class="prep-count-label" data-i18n="foodChampagne">Champagne Enfant</span>
+        </div>
+      </div>
+
+      <!-- List of active groups for table & briefing -->
+      <div class="kitchen-grid">
+        <div id="kitchen-groups-list">
+          <!-- Injected via JavaScript -->
+        </div>
+
+        <div class="glass-panel" style="padding:24px; height:fit-content;">
+          <h3 style="margin-bottom:12px;" data-i18n="checklistTitle">Check-list Opérations</h3>
+          <ul style="color:var(--text-secondary); font-size:0.9rem; list-style:none; display:flex; flex-direction:column; gap:12px;">
+            <li style="display:flex; align-items:center; gap:8px;">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--laser-green)" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+              <span data-i18n="checklistJungle">Vérification des gilets et blasters (Arène Jungle)</span>
+            </li>
+            <li style="display:flex; align-items:center; gap:8px;">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--laser-green)" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+              <span data-i18n="checklistPrison">Vérification des gilets et blasters (Arène Prison)</span>
+            </li>
+            <li style="display:flex; align-items:center; gap:8px;">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--laser-green)" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+              <span data-i18n="checklistDrinks">Préparation des pichets d'eau et softs à température</span>
+            </li>
+            <li style="display:flex; align-items:center; gap:8px;">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--laser-green)" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+              <span data-i18n="checklistSmoke">Allumage machine à fumée et sono briefing</span>
+            </li>
+            <li style="display:flex; align-items:center; gap:8px;">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--laser-green)" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+              <span data-i18n="checklistTeams">Distribution des fiches d'équipes aux parents</span>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- TAB: CRM & Database Clients -->
+    <section class="tab-view" id="tab-clients">
+      <!-- Top Title & Controls Row -->
+      <div class="timeline-card" style="margin-bottom:20px;">
+        <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:16px;">
+          <div>
+            <h2 data-i18n="clientsPageTitle" style="font-size:1.4rem; font-weight:800; margin:0 0 4px 0;">Fichier & Base de Données Clients (CRM)</h2>
+            <p data-i18n="clientsPageSub" style="color:var(--text-secondary); font-size:0.88rem; margin:0;">
+              Répertoire complet des organisateurs, historique des réservations, fidélité et contacts directs
+            </p>
+          </div>
+          <div style="display:flex; gap:10px; flex-wrap:wrap;">
+            <button type="button" class="btn btn-secondary btn-sm" id="btn-open-import-amelia" style="border-color:rgba(0,240,255,0.4); color:var(--laser-cyan); background:rgba(0,240,255,0.06); display:inline-flex; align-items:center; gap:6px;">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+              <span data-i18n="importAmeliaBtn">Importer CSV Amelia</span>
+            </button>
+            <button type="button" class="btn btn-secondary btn-sm" id="btn-export-clients" style="display:inline-flex; align-items:center; gap:6px;">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+              <span>Exporter CSV</span>
+            </button>
+            <button type="button" class="btn btn-primary btn-sm btn-open-quick-booking" style="display:inline-flex; align-items:center; gap:6px;">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+              <span>Nouveau Client / Dossier</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- KPI Summary Cards -->
+      <div class="summary-cards-row">
+        <div class="prep-count-card">
+          <span class="prep-count-num" id="crm-total-count" style="color:var(--laser-cyan);">0</span>
+          <span class="prep-count-label" data-i18n="crmUniqueClients">Clients Uniques Enregistrés</span>
+        </div>
+        <div class="prep-count-card">
+          <span class="prep-count-num" id="crm-corporate-count" style="color:var(--laser-green);">0</span>
+          <span class="prep-count-label" data-i18n="crmCorporateAccounts">Comptes Entreprises (B2B)</span>
+        </div>
+        <div class="prep-count-card">
+          <span class="prep-count-num" id="crm-total-spent" style="color:#ffffff;">0,00 €</span>
+          <span class="prep-count-label" data-i18n="crmTotalRevenue">Chiffre d'Affaires Cumulé (LTV)</span>
+        </div>
+        <div class="prep-count-card">
+          <span class="prep-count-num" id="crm-repeat-count" style="color:var(--laser-pink);">0</span>
+          <span class="prep-count-label" data-i18n="crmRepeatClients">Clients Fidèles (2+ Visites)</span>
+        </div>
+        <div class="prep-count-card">
+          <span class="prep-count-num" id="crm-avg-spent" style="color:var(--laser-amber);">0,00 €</span>
+          <span class="prep-count-label" data-i18n="crmAvgBasket">Panier Moyen par Client</span>
+        </div>
+      </div>
+
+      <!-- Toolbar: Search & Segment Filter Pills -->
+      <div class="bookings-toolbar-card" style="margin-bottom:16px;">
+        <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:14px;">
+          <!-- Live Search Bar -->
+          <div style="position:relative; flex:1; min-width:280px; max-width:440px;">
+            <input type="text" id="clients-search-input" class="form-input" data-i18n-placeholder="crmSearchPlaceholder" placeholder="Rechercher par nom, téléphone, e-mail, entreprise ou TVA..." style="width:100%; border-radius:var(--radius-full); padding:9px 16px 9px 38px; font-size:0.88rem;">
+            <span style="position:absolute; left:14px; top:50%; transform:translateY(-50%); color:var(--text-muted); display:flex;">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+            </span>
+          </div>
+
+          <!-- Filter Pills -->
+          <div class="pill-filter-group" id="clients-filter-pills" style="display:flex; gap:6px; flex-wrap:wrap;">
+            <button type="button" class="btn btn-secondary btn-sm pill-filter-btn active" data-filter="all">Tous (<span id="pill-clients-all">0</span>)</button>
+            <button type="button" class="btn btn-secondary btn-sm pill-filter-btn" data-filter="individual"><span data-i18n="crmIndividuals">Particuliers</span> (<span id="pill-clients-ind">0</span>)</button>
+            <button type="button" class="btn btn-secondary btn-sm pill-filter-btn" data-filter="corporate"><span data-i18n="crmCorporate">Entreprises B2B</span> (<span id="pill-clients-corp">0</span>)</button>
+            <button type="button" class="btn btn-secondary btn-sm pill-filter-btn" data-filter="vip"><span data-i18n="crmVip">Fidèles VIP</span> (<span id="pill-clients-vip">0</span>)</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Clients Data Table -->
+      <div class="glass-panel" style="overflow-x:auto; padding:0; border-radius:var(--radius-xl); box-shadow:var(--shadow-md);">
+        <table class="data-table" id="clients-table">
+          <thead>
+            <tr>
+              <th style="width:240px;" data-i18n="crmColClient">Client / Contact</th>
+              <th style="width:200px;" data-i18n="crmColContact">Téléphone & E-mail</th>
+              <th style="width:230px;" data-i18n="crmColTax">Type & Filiation / TVA</th>
+              <th style="text-align:center; width:120px;" data-i18n="crmColVisits">Visites</th>
+              <th style="width:120px;" data-i18n="crmColLastDate">Dernière Date</th>
+              <th style="text-align:right; width:150px;" data-i18n="crmColLtv">Total Dépensé (LTV)</th>
+              <th style="text-align:center; width:170px;" data-i18n="crmColActions">Actions CRM</th>
+            </tr>
+          </thead>
+          <tbody id="clients-table-body">
+            <!-- Injected via JavaScript -->
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- TAB 4: Iframe Embed Generator & Preview -->
+    <section class="tab-view" id="tab-embed">
+      <div class="timeline-card">
+        <div style="display:flex; justify-content:space-between; align-items:flex-start; flex-wrap:wrap; gap:16px; margin-bottom:20px; border-bottom:1px solid var(--border-subtle); padding-bottom:16px;">
+          <div>
+            <h2 style="font-size:1.4rem; font-weight:800; margin:0 0 6px 0;" data-i18n="embedHubTitle">Hub d'Intégration : API REST & Webhooks</h2>
+            <p style="color:var(--text-secondary); font-size:0.88rem; margin:0;" data-i18n="embedHubSub">
+              Connectez Laser Magic en temps réel avec vos logiciels de caisse (POS), vos bornes tactiles, Zapier, Make ou votre site Webflow
+            </p>
+          </div>
+          <!-- Sub-navigation Pills -->
+          <div class="integration-subtabs" id="integration-subtabs">
+            <button type="button" class="integration-subtab-btn active" data-subtab="webhooks">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+              <span data-i18n="subtabWebhooks">Webhooks Sortants (POS & Apps)</span>
+            </button>
+            <button type="button" class="integration-subtab-btn" data-subtab="api">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+              <span data-i18n="subtabApi">API REST & Clés</span>
+            </button>
+            <button type="button" class="integration-subtab-btn" data-subtab="widget">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="20" height="14" x="2" y="5" rx="2"/><line x1="2" x2="22" y1="10" y2="10"/></svg>
+              <span data-i18n="subtabWidget">Widget Iframe Webflow</span>
+            </button>
+            <button type="button" class="integration-subtab-btn" data-subtab="communications">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m22 2-7 20-4-9-9-4Z"/><path d="M22 2 11 13"/></svg>
+              <span data-i18n="subtabCommunications">Passerelles E-mail & WhatsApp</span>
+            </button>
+            <button type="button" class="integration-subtab-btn" data-subtab="portal">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+              <span>Portail Client (Aperçu Live)</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- SUBVIEW 1: Webhooks Sortants (POS / Zapier / Make) -->
+        <div class="integration-subview" id="subview-webhooks">
+          <div style="display:grid; grid-template-columns: 1fr 1fr; gap:24px;">
+            <!-- Configuration Form -->
+            <div class="glass-panel" style="padding:22px; border-radius:20px;">
+              <h3 style="font-size:1.1rem; font-weight:800; margin:0 0 14px 0; color:var(--text-white); display:flex; align-items:center; gap:8px;">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--laser-cyan)" stroke-width="2"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+                <span>Paramètres du Webhook Sortant</span>
+              </h3>
+              
+              <div style="display:flex; flex-direction:column; gap:14px;">
+                <div>
+                  <label style="font-size:0.8rem; font-weight:700; color:var(--text-secondary); margin-bottom:5px; display:block;">URL de Réception (Webhook Endpoint) :</label>
+                  <input type="url" id="webhook-endpoint-url" class="form-input" value="https://api.lasermagic.be/webhook/orders" placeholder="https://votre-serveur.com/api/webhook" style="width:100%; border-radius:var(--radius-full); font-size:0.88rem; padding:8px 16px;">
+                </div>
+
+                <div>
+                  <label style="font-size:0.8rem; font-weight:700; color:var(--text-secondary); margin-bottom:5px; display:block;">Secret de Signature HMAC (X-Laser-Signature) :</label>
+                  <div style="display:flex; gap:8px;">
+                    <input type="text" id="webhook-secret-token" class="form-input" value="whsec_laser_9f83a12b4e" readonly style="width:100%; border-radius:var(--radius-full); font-size:0.85rem; padding:8px 16px;">
+                    <button type="button" class="btn btn-secondary btn-sm" id="btn-regen-webhook-secret" title="Générer une nouvelle clé secrète">Régénérer</button>
+                  </div>
+                </div>
+
+                <div>
+                  <label style="font-size:0.8rem; font-weight:700; color:var(--text-secondary); margin-bottom:8px; display:block;">Événements à Déclencher :</label>
+                  <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px; font-size:0.84rem; color:var(--text-primary);">
+                    <label style="display:flex; align-items:center; gap:8px; cursor:pointer;">
+                      <input type="checkbox" id="wh-evt-create" checked style="accent-color:var(--laser-cyan);">
+                      <span><code>booking.created</code></span>
+                    </label>
+                    <label style="display:flex; align-items:center; gap:8px; cursor:pointer;">
+                      <input type="checkbox" id="wh-evt-confirm" checked style="accent-color:var(--laser-cyan);">
+                      <span><code>booking.client_confirmed</code></span>
+                    </label>
+                    <label style="display:flex; align-items:center; gap:8px; cursor:pointer;">
+                      <input type="checkbox" id="wh-evt-paid" checked style="accent-color:var(--laser-cyan);">
+                      <span><code>payment.deposit_received</code></span>
+                    </label>
+                    <label style="display:flex; align-items:center; gap:8px; cursor:pointer;">
+                      <input type="checkbox" id="wh-evt-pos" checked style="accent-color:var(--laser-cyan);">
+                      <span><code>pos.order_sync</code></span>
+                    </label>
+                  </div>
+                </div>
+
+                <div style="display:flex; gap:10px; margin-top:10px; flex-wrap:wrap;">
+                  <button type="button" class="btn btn-primary" id="btn-save-webhook-config">
+                    <span>Enregistrer Configuration</span>
+                  </button>
+                  <button type="button" class="btn btn-pill-action" id="btn-trigger-test-webhook">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+                    <span>Déclencher Test Webhook</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Live Payload & Delivery Preview -->
+            <div class="glass-panel" style="padding:22px; border-radius:20px; display:flex; flex-direction:column;">
+              <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+                <h3 style="font-size:1.1rem; font-weight:800; margin:0; color:var(--text-white);">Dernier Payload Livré (JSON)</h3>
+                <span class="badge" id="webhook-last-status" style="background:rgba(0,255,136,0.15); color:var(--laser-green); border:1px solid rgba(0,255,136,0.3); font-weight:800; padding:4px 10px; border-radius:var(--radius-full);">
+                  200 OK (34ms)
+                </span>
+              </div>
+              <div style="flex-grow:1; background:var(--bg-primary); border:1px solid var(--border-subtle); border-radius:14px; padding:14px; overflow-x:auto;">
+                <pre id="webhook-payload-preview" style="margin:0; font-size:0.78rem; color:#38bdf8; line-height:1.45;"></pre>
+              </div>
+            </div>
+          </div>
+
+          <!-- Webhook Recent Logs Table -->
+          <div style="margin-top:24px;">
+            <h4 style="font-size:1rem; font-weight:800; margin:0 0 12px 0;">Journal des Requêtes Webhook Récentes</h4>
+            <div class="data-table-wrap">
+              <table class="data-table" style="font-size:0.85rem;">
+                <thead>
+                  <tr>
+                    <th>Horodatage</th>
+                    <th>Événement</th>
+                    <th>N° Commande</th>
+                    <th>Réf Dossier</th>
+                    <th>URL Cible</th>
+                    <th>Statut HTTP</th>
+                  </tr>
+                </thead>
+                <tbody id="webhook-logs-body">
+                  <!-- Injected via JavaScript -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- SUBVIEW 2: API REST & Clés Secrètes (Applications Tierces) -->
+        <div class="integration-subview" id="subview-api" style="display:none;">
+          <div style="margin-bottom:20px; background:var(--bg-surface); padding:20px 24px; border-radius:20px; border:1px solid var(--border-subtle);">
+            <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px;">
+              <div>
+                <strong style="color:var(--text-white); font-size:0.95rem;">Clé API Pro (Bearer Token)</strong>
+                <p style="color:var(--text-secondary); font-size:0.82rem; margin:3px 0 0 0;">Utilisez cet en-tête d'autorisation : <code>Authorization: Bearer lsm_live_...</code></p>
+              </div>
+              <div style="display:flex; gap:8px;">
+                <input type="text" id="api-key-display" value="lsm_live_9a7b8c1d2e3f4g5h6i7j8k9l0m" readonly class="form-input" style="width:260px; font-weight:700; border-radius:var(--radius-full); padding:6px 14px; font-size:0.85rem;">
+                <button type="button" class="btn btn-secondary btn-sm" id="btn-copy-api-key">Copier Clé</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- REST API Endpoints -->
+          <div style="display:grid; grid-template-columns: 1fr 1fr; gap:16px;">
+            <div class="api-endpoint-card">
+              <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+                <span class="api-method-badge method-get">GET</span>
+                <span class="badge-order">LISTE COMMANDES</span>
+              </div>
+              <code style="font-weight:700; color:var(--text-white); font-size:0.95rem;">/api/v1/orders</code>
+              <p style="color:var(--text-secondary); font-size:0.82rem; margin:6px 0 10px 0;">Récupère toutes les commandes avec numéros de ticket (#042), arène et suppléments.</p>
+              <button type="button" class="btn btn-secondary btn-sm" onclick="window.testApiEndpoint('GET /api/v1/orders')">Tester Endpoint</button>
+            </div>
+
+            <div class="api-endpoint-card">
+              <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+                <span class="api-method-badge method-post">POST</span>
+                <span class="badge" style="background:rgba(255,27,123,0.15); color:var(--laser-pink); border:1px solid rgba(255,27,123,0.3); font-size:0.7rem; font-weight:700;">KIOSK / APP</span>
+              </div>
+              <code style="font-weight:700; color:var(--text-white); font-size:0.95rem;">/api/v1/orders</code>
+              <p style="color:var(--text-secondary); font-size:0.82rem; margin:6px 0 10px 0;">Injecte une réservation ou ticket de caisse depuis une borne tactile externe.</p>
+              <button type="button" class="btn btn-secondary btn-sm" onclick="window.testApiEndpoint('POST /api/v1/orders')">Tester Endpoint</button>
+            </div>
+
+            <div class="api-endpoint-card">
+              <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+                <span class="api-method-badge method-get">GET</span>
+                <span class="badge" style="background:rgba(0,240,255,0.15); color:var(--laser-cyan); border:1px solid rgba(0,240,255,0.3); font-size:0.7rem; font-weight:700;">DÉTAIL</span>
+              </div>
+              <code style="font-weight:700; color:var(--text-white); font-size:0.95rem;">/api/v1/orders/:orderNumber</code>
+              <p style="color:var(--text-secondary); font-size:0.82rem; margin:6px 0 10px 0;">Cherche une commande par son numéro de ticket (ex: 42) avec photos et statut.</p>
+              <button type="button" class="btn btn-secondary btn-sm" onclick="window.testApiEndpoint('GET /api/v1/orders/42')">Tester Endpoint</button>
+            </div>
+
+            <div class="api-endpoint-card">
+              <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+                <span class="api-method-badge method-post">POST</span>
+                <span class="badge-order">BRIDGE CAISSE</span>
+              </div>
+              <code style="font-weight:700; color:var(--text-white); font-size:0.95rem;">/api/v1/pos/sync</code>
+              <p style="color:var(--text-secondary); font-size:0.82rem; margin:6px 0 10px 0;">Synchronisation bidirectionnelle des règlements entre le terminal de caisse et Laser Magic.</p>
+              <button type="button" class="btn btn-secondary btn-sm" onclick="window.testApiEndpoint('POST /api/v1/pos/sync')">Tester Endpoint</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- SUBVIEW 3: Widget Iframe Webflow (lasermagic.be) -->
+        <div class="integration-subview" id="subview-widget" style="display:none;">
+          <div class="embed-preview-split">
+            <div>
+              <div class="code-snippet-box">
+                <pre id="embed-code-snippet"></pre>
+              </div>
+              <div style="margin-top:16px; display:flex; gap:12px;">
+                <button type="button" class="btn btn-primary" id="btn-copy-embed-code" data-i18n="copyCodeBtn">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>
+                  <span>Copier le code d'intégration</span>
+                </button>
+                <a href="./embed-preview.html" target="_blank" class="btn btn-secondary">
+                  <span>Ouvrir la démo Webflow</span>
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+                </a>
+              </div>
+
+              <div class="glass-panel" style="padding:20px; margin-top:24px;">
+                <h4 style="margin-bottom:10px; color:var(--laser-cyan);">Avantages de ce nouveau Widget vs Amelia :</h4>
+                <ul style="font-size:0.88rem; color:var(--text-secondary); display:flex; flex-direction:column; gap:8px;">
+                  <li><strong>Vitesse de chargement instantanée</strong> : aucune dépendance WordPress lourde.</li>
+                  <li><strong>Hauteur 100% dynamique</strong> : grâce au script postMessage inclus, aucune barre de défilement double sur mobile.</li>
+                  <li><strong>Synchronisation temps réel</strong> : chaque réservation apparaît en direct sur votre Back-Office.</li>
+                  <li><strong>Trilingue natif</strong> : Français, Néerlandais et Anglais sans plugin externe.</li>
+                </ul>
+              </div>
+            </div>
+
+            <div>
+              <h4 style="margin-bottom:10px;">Aperçu du Widget Iframe :</h4>
+              <div class="live-iframe-device">
+                <iframe src="./widget.html" title="Widget Live Preview"></iframe>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- SUBVIEW 4: Passerelles E-mail & WhatsApp (Resend, Meta Cloud, Twilio, Webhooks) -->
+        <div class="integration-subview" id="subview-communications" style="display:none;">
+          <div style="display:grid; grid-template-columns: 1fr 1fr; gap:24px; margin-bottom:24px;">
+            <!-- E-mail Service Card -->
+            <div class="glass-panel" style="padding:22px; border-radius:20px;">
+              <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px;">
+                <h3 style="font-size:1.1rem; font-weight:800; margin:0; color:var(--text-white); display:flex; align-items:center; gap:8px;">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--laser-cyan)" stroke-width="2"><rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
+                  <span data-i18n="commEmailTitle">Configuration Passerelle E-mail</span>
+                </h3>
+                <span class="badge" id="badge-email-status" style="background:rgba(0,240,255,0.12); color:var(--laser-cyan); border:1px solid rgba(0,240,255,0.3); font-weight:800; padding:3px 8px; border-radius:var(--radius-full); font-size:0.75rem;">
+                  BREVO ACTIVE
+                </span>
+              </div>
+
+              <div style="display:flex; flex-direction:column; gap:12px;">
+                <div>
+                  <label style="font-size:0.8rem; font-weight:700; color:var(--text-secondary); margin-bottom:5px; display:block;">Fournisseur / Prestataire E-mail :</label>
+                  <select id="comm-email-provider" class="form-input" style="width:100%; border-radius:var(--radius-full); font-size:0.88rem; padding:8px 16px;">
+                    <option value="brevo" selected>Brevo / Sendinblue (API v3 · Actif)</option>
+                    <option value="resend">Resend API</option>
+                    <option value="sendgrid">SendGrid Mail API</option>
+                    <option value="webhook_proxy">Passerelle Webhook (Make / Zapier / N8N / Custom)</option>
+                    <option value="simulated">Mode Simulation Démo (Boîte virtuelle)</option>
+                  </select>
+                </div>
+
+                <div id="comm-email-key-wrap">
+                  <label style="font-size:0.8rem; font-weight:700; color:var(--text-secondary); margin-bottom:5px; display:block;">Clé d'API (Brevo / Sendinblue v3) :</label>
+                  <input type="password" id="comm-email-apikey" class="form-input" placeholder="Clé API secrète..." style="width:100%; border-radius:var(--radius-full); font-size:0.85rem; padding:8px 16px;">
+                </div>
+
+                <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+                  <div>
+                    <label style="font-size:0.8rem; font-weight:700; color:var(--text-secondary); margin-bottom:5px; display:block;">Nom Expéditeur :</label>
+                    <input type="text" id="comm-email-sender-name" class="form-input" value="Laser Magic Vilvoorde" style="width:100%; border-radius:var(--radius-full); font-size:0.85rem; padding:8px 16px;">
+                  </div>
+                  <div>
+                    <label style="font-size:0.8rem; font-weight:700; color:var(--text-secondary); margin-bottom:5px; display:block;">Adresse E-mail Expéditeur :</label>
+                    <input type="email" id="comm-email-sender-email" class="form-input" value="jeka7ro@gmail.com" style="width:100%; border-radius:var(--radius-full); font-size:0.85rem; padding:8px 16px;">
+                  </div>
+                </div>
+
+                <div id="comm-email-webhook-wrap" style="display:none;">
+                  <label style="font-size:0.8rem; font-weight:700; color:var(--text-secondary); margin-bottom:5px; display:block;">URL Webhook Envoi E-mail :</label>
+                  <input type="url" id="comm-email-webhook-url" class="form-input" placeholder="https://hook.eu1.make.com/..." style="width:100%; border-radius:var(--radius-full); font-size:0.85rem; padding:8px 16px;">
+                </div>
+
+                <div>
+                  <label style="font-size:0.8rem; font-weight:700; color:var(--text-secondary); margin-bottom:6px; display:block;">Déclencheurs Automatiques :</label>
+                  <div style="display:flex; flex-direction:column; gap:6px; font-size:0.82rem; color:var(--text-primary);">
+                    <label style="display:flex; align-items:center; gap:8px; cursor:pointer;">
+                      <input type="checkbox" id="comm-email-auto-booking" checked style="accent-color:var(--laser-cyan);">
+                      <span>Envoyer e-mail de confirmation dès la création de commande</span>
+                    </label>
+                    <label style="display:flex; align-items:center; gap:8px; cursor:pointer;">
+                      <input type="checkbox" id="comm-email-auto-confirm" checked style="accent-color:var(--laser-cyan);">
+                      <span>Envoyer accusé de réception à la validation portail client</span>
+                    </label>
+                  </div>
+                </div>
+
+                <div style="display:flex; gap:10px; margin-top:8px; align-items:center; flex-wrap:wrap;">
+                  <button type="button" class="btn btn-primary btn-sm" id="btn-save-comm-email">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/></svg>
+                    <span>Enregistrer Paramètres E-mail</span>
+                  </button>
+                </div>
+
+                <!-- Test Email Live Box -->
+                <div style="background:rgba(0,240,255,0.04); border:1px solid rgba(0,240,255,0.2); border-radius:14px; padding:12px; margin-top:6px;">
+                  <label style="font-size:0.78rem; font-weight:700; color:var(--laser-cyan); margin-bottom:5px; display:block;">Tester l'envoi d'e-mail en temps réel :</label>
+                  <div style="display:flex; gap:8px;">
+                    <input type="email" id="comm-email-test-dest" class="form-input" placeholder="destinataire@exemple.com" style="flex:1; border-radius:var(--radius-full); font-size:0.82rem; padding:6px 14px;">
+                    <button type="button" class="btn btn-secondary btn-sm" id="btn-test-send-email" style="white-space:nowrap; border-color:rgba(0,240,255,0.4); color:var(--laser-cyan);">
+                      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+                      <span>Tester Envoi</span>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- WhatsApp Service Card -->
+            <div class="glass-panel" style="padding:22px; border-radius:20px;">
+              <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px;">
+                <h3 style="font-size:1.1rem; font-weight:800; margin:0; color:var(--text-white); display:flex; align-items:center; gap:8px;">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#25D366" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+                  <span data-i18n="commWaTitle">Configuration Passerelle WhatsApp</span>
+                </h3>
+                <span class="badge" id="badge-wa-status" style="background:rgba(37,211,102,0.12); color:#25D366; border:1px solid rgba(37,211,102,0.3); font-weight:800; padding:3px 8px; border-radius:var(--radius-full); font-size:0.75rem;">
+                  META CLOUD ACTIVE
+                </span>
+              </div>
+
+              <div style="display:flex; flex-direction:column; gap:12px;">
+                <div>
+                  <label style="font-size:0.8rem; font-weight:700; color:var(--text-secondary); margin-bottom:5px; display:block;">Mode & Passerelle WhatsApp :</label>
+                  <select id="comm-wa-provider" class="form-input" style="width:100%; border-radius:var(--radius-full); font-size:0.88rem; padding:8px 16px;">
+                    <option value="meta_cloud">WhatsApp Cloud API (Officiel Meta Business)</option>
+                    <option value="twilio">Twilio Programmable WhatsApp</option>
+                    <option value="webhook_proxy">Passerelle Webhook (Make / Zapier / Green-API)</option>
+                    <option value="whatsapp_web">WhatsApp Web / Application (Manuel 1-Clic)</option>
+                  </select>
+                </div>
+
+                <div id="comm-wa-meta-wrap">
+                  <div style="margin-bottom:8px;">
+                    <label style="font-size:0.8rem; font-weight:700; color:var(--text-secondary); margin-bottom:5px; display:block;">Phone Number ID (Meta Graph) :</label>
+                    <input type="text" id="comm-wa-phone-id" class="form-input" placeholder="104857291048591" style="width:100%; border-radius:var(--radius-full); font-size:0.85rem; padding:8px 16px;">
+                  </div>
+                  <div>
+                    <label style="font-size:0.8rem; font-weight:700; color:var(--text-secondary); margin-bottom:5px; display:block;">Access Token Meta (Permanent ou Temporaire) :</label>
+                    <input type="password" id="comm-wa-token" class="form-input" placeholder="EAAG...votre_token" style="width:100%; border-radius:var(--radius-full); font-size:0.85rem; padding:8px 16px;">
+                  </div>
+                </div>
+
+                <div id="comm-wa-twilio-wrap" style="display:none;">
+                  <div style="margin-bottom:8px;">
+                    <label style="font-size:0.8rem; font-weight:700; color:var(--text-secondary); margin-bottom:5px; display:block;">Account SID Twilio :</label>
+                    <input type="text" id="comm-wa-twilio-sid" class="form-input" placeholder="AC..." style="width:100%; border-radius:var(--radius-full); font-size:0.85rem; padding:8px 16px;">
+                  </div>
+                  <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+                    <div>
+                      <label style="font-size:0.8rem; font-weight:700; color:var(--text-secondary); margin-bottom:5px; display:block;">Auth Token :</label>
+                      <input type="password" id="comm-wa-twilio-token" class="form-input" placeholder="secret..." style="width:100%; border-radius:var(--radius-full); font-size:0.85rem; padding:8px 16px;">
+                    </div>
+                    <div>
+                      <label style="font-size:0.8rem; font-weight:700; color:var(--text-secondary); margin-bottom:5px; display:block;">Numéro Émetteur Twilio :</label>
+                      <input type="text" id="comm-wa-twilio-from" class="form-input" placeholder="whatsapp:+14155238886" style="width:100%; border-radius:var(--radius-full); font-size:0.85rem; padding:8px 16px;">
+                    </div>
+                  </div>
+                </div>
+
+                <div id="comm-wa-webhook-wrap" style="display:none;">
+                  <label style="font-size:0.8rem; font-weight:700; color:var(--text-secondary); margin-bottom:5px; display:block;">URL Webhook WhatsApp :</label>
+                  <input type="url" id="comm-wa-webhook-url" class="form-input" placeholder="https://api.lasermagic.be/whatsapp/send" style="width:100%; border-radius:var(--radius-full); font-size:0.85rem; padding:8px 16px;">
+                </div>
+
+                <div>
+                  <label style="font-size:0.8rem; font-weight:700; color:var(--text-secondary); margin-bottom:6px; display:block;">Déclencheurs Automatiques :</label>
+                  <div style="display:flex; flex-direction:column; gap:6px; font-size:0.82rem; color:var(--text-primary);">
+                    <label style="display:flex; align-items:center; gap:8px; cursor:pointer;">
+                      <input type="checkbox" id="comm-wa-auto-booking" style="accent-color:#25D366;">
+                      <span>Envoyer récapitulatif WhatsApp à chaque nouvelle réservation</span>
+                    </label>
+                    <label style="display:flex; align-items:center; gap:8px; cursor:pointer;">
+                      <input type="checkbox" id="comm-wa-auto-confirm" checked style="accent-color:#25D366;">
+                      <span>Notifier sur WhatsApp lors de la confirmation client</span>
+                    </label>
+                  </div>
+                </div>
+
+                <div style="display:flex; gap:10px; margin-top:8px; align-items:center; flex-wrap:wrap;">
+                  <button type="button" class="btn btn-primary btn-sm" id="btn-save-comm-wa" style="background:#25D366; border-color:#25D366; color:#04070f;">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/></svg>
+                    <span>Enregistrer Paramètres WhatsApp</span>
+                  </button>
+                </div>
+
+                <!-- Test WhatsApp Live Box -->
+                <div style="background:rgba(37,211,102,0.05); border:1px solid rgba(37,211,102,0.25); border-radius:14px; padding:12px; margin-top:6px;">
+                  <label style="font-size:0.78rem; font-weight:700; color:#25D366; margin-bottom:5px; display:block;">Tester l'envoi WhatsApp en direct :</label>
+                  <div style="display:flex; gap:8px;">
+                    <input type="tel" id="comm-wa-test-phone" class="form-input" placeholder="+32 470 12 34 56" style="flex:1; border-radius:var(--radius-full); font-size:0.82rem; padding:6px 14px;">
+                    <button type="button" class="btn btn-secondary btn-sm" id="btn-test-send-wa" style="white-space:nowrap; border-color:rgba(37,211,102,0.4); color:#25D366;">
+                      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+                      <span>Tester WhatsApp</span>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Global Communications Audit Log Table -->
+          <div>
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; flex-wrap:wrap; gap:10px;">
+              <h4 style="font-size:1rem; font-weight:800; margin:0;" data-i18n="commLogsTitle">Journal Global des Envois & Notifications (E-mail & WhatsApp)</h4>
+              <button type="button" class="btn btn-secondary btn-sm" id="btn-refresh-comm-logs">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
+                <span>Actualiser Journal</span>
+              </button>
+            </div>
+            <div class="data-table-wrap">
+              <table class="data-table" style="font-size:0.85rem;">
+                <thead>
+                  <tr>
+                    <th>Horodatage</th>
+                    <th>Canal</th>
+                    <th>N° Commande</th>
+                    <th>Dossier</th>
+                    <th>Destinataire</th>
+                    <th>Type Message</th>
+                    <th>Prestataire</th>
+                    <th>Statut</th>
+                    <th>Détails & Suivi</th>
+                  </tr>
+                </thead>
+                <tbody id="comm-logs-body">
+                  <!-- Injected via JavaScript -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- SUBVIEW 5: Aperçu Portail Client (Live Iframe) -->
+        <div class="integration-subview" id="subview-portal" style="display:none;">
+          <div style="background:var(--bg-card); border:1px solid var(--border-medium); border-radius:20px; padding:22px; margin-bottom:20px;">
+            <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:14px; margin-bottom:18px;">
+              <div>
+                <h3 style="font-size:1.15rem; font-weight:800; color:#fff; margin:0 0 4px 0; display:flex; align-items:center; gap:8px;">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--laser-cyan)" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+                  <span>Aperçu Interactif de la Page Client (Portail de Confirmation)</span>
+                </h3>
+                <p style="font-size:0.84rem; color:var(--text-secondary); margin:0;">
+                  Voici exactement l'interface que le parent ou l'entreprise consulte sur mobile/PC via le lien magique.
+                </p>
+              </div>
+              <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
+                <label style="font-size:0.82rem; color:var(--text-secondary); font-weight:700;">Dossier client :</label>
+                <select id="portal-preview-booking-select" class="form-input" style="padding:6px 14px; font-size:0.85rem; border-radius:var(--radius-full); min-width:280px;">
+                  <!-- Injected via JavaScript -->
+                </select>
+                <a href="./confirm.html" target="_blank" id="btn-open-portal-external" class="btn btn-primary btn-sm" style="padding:7px 16px; font-weight:700; border-radius:var(--radius-full); text-decoration:none; display:inline-flex; align-items:center; gap:6px;">
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+                  <span>Ouvrir en plein écran</span>
+                </a>
+              </div>
+            </div>
+            <!-- Iframe Container -->
+            <div style="background:#04070f; border:1px solid var(--border-subtle); border-radius:14px; overflow:hidden; height:740px; box-shadow:0 12px 32px rgba(0,0,0,0.5);">
+              <iframe id="portal-preview-iframe" src="./confirm.html" style="width:100%; height:100%; border:none;" title="Aperçu Portail Client"></iframe>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+      </main>
+    </div> <!-- /.admin-content-wrap -->
+  </div> <!-- /.admin-layout -->
+
+  <!-- MODAL: Booking Detail Drawer -->
+  <div class="modal-overlay" id="booking-modal-overlay">
+    <div class="modal-card">
+      <div class="modal-head">
+        <h3>Détails de la Réservation</h3>
+        <button type="button" class="btn btn-secondary btn-sm" id="btn-close-modal" aria-label="Fermer">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      </div>
+      <div class="modal-body" id="booking-modal-content">
+        <!-- Injected via JavaScript -->
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: Quick Phone Booking -->
+  <div class="modal-overlay" id="quick-booking-modal">
+    <div class="modal-card" style="max-width: 660px;">
+      <div class="modal-head">
+        <div class="modal-head-info">
+          <h3>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:var(--laser-cyan);"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+            <span data-i18n="qbModalTitle">Nouvelle Réservation Téléphonique</span>
+          </h3>
+          <p class="modal-subtitle" data-i18n="qbModalSub">Prise rapide d'une réservation au téléphone ou au comptoir d'accueil</p>
+        </div>
+        <button type="button" class="modal-close-btn" id="btn-close-quick-modal" aria-label="Fermer">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      </div>
+      <form id="quick-booking-form">
+        <div class="modal-body" style="padding: 20px 24px;">
+          <!-- Booking Type Selector (Particulier vs Team Building / Corporate B2B) -->
+          <div style="display:flex; gap:10px; margin-bottom:16px; background:var(--bg-surface); padding:4px; border-radius:var(--radius-full); border:1px solid var(--border-subtle);">
+            <button type="button" class="btn btn-sm qb-type-btn active" id="btn-type-individual" style="flex:1; justify-content:center; border-radius:var(--radius-full); font-weight:700;">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+              <span data-i18n="typeIndividual">Particulier / Anniversaire</span>
+            </button>
+            <button type="button" class="btn btn-sm qb-type-btn" id="btn-type-corporate" style="flex:1; justify-content:center; border-radius:var(--radius-full); font-weight:700; color:var(--text-secondary);">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
+              <span data-i18n="typeCorporate">Entreprise / Team Building (B2B)</span>
+            </button>
+          </div>
+
+          <!-- Section 1: Client & Contact -->
+          <div class="modal-section">
+            <div class="modal-section-title">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+              <span data-i18n="qbSectionContact">Contact & Organisateur</span>
+            </div>
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:14px;">
+              <div class="form-group" style="margin-bottom:0;">
+                <label class="form-label"><span id="qb-name-label" data-i18n="qbLabelClientName">Nom du contact</span> <span class="required-star">*</span></label>
+                <input type="text" id="qb-name" class="form-input" required placeholder="Ex: Marc Martin">
+              </div>
+              <div class="form-group" style="margin-bottom:0;">
+                <label class="form-label"><span data-i18n="qbLabelPhone">Téléphone portable</span> <span class="required-star">*</span></label>
+                <input type="tel" id="qb-phone" class="form-input" required placeholder="+32 470 11 22 33">
+              </div>
+            </div>
+            <div style="display:grid; grid-template-columns:1.3fr 1fr; gap:14px; margin-top:12px;">
+              <div class="form-group" style="margin-bottom:0;">
+                <label class="form-label" data-i18n="qbLabelEmail">Email (pour confirmation & facturation)</label>
+                <input type="email" id="qb-email" class="form-input" placeholder="client@entreprise.be">
+              </div>
+              <div class="form-group" style="margin-bottom:0;">
+                <label class="form-label" data-i18n="qbLabelLang">Langue client</label>
+                <select id="qb-lang" class="form-input">
+                  <option value="fr">Français (FR)</option>
+                  <option value="nl">Nederlands (NL)</option>
+                  <option value="en">English (EN)</option>
+                </select>
+              </div>
+            </div>
+
+            <!-- Child birthday subsection (Hidden in corporate mode) -->
+            <div id="qb-child-section" style="display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-top:12px; background:rgba(255,27,123,0.05); border:1px solid rgba(255,27,123,0.25); padding:10px 14px; border-radius:12px;">
+              <div class="form-group" style="margin-bottom:0;">
+                <label class="form-label" style="color:var(--laser-pink); font-weight:700;" data-i18n="qbLabelChildName">Prénom de l'enfant fêté</label>
+                <input type="text" id="qb-child" class="form-input" placeholder="Ex: Lucas (10 ans)">
+              </div>
+              <div class="form-group" style="margin-bottom:0;">
+                <label class="form-label" style="display:flex; justify-content:space-between; align-items:center;">
+                  <span style="color:var(--laser-pink); font-weight:700;" data-i18n="qbLabelChildDob">Date de naissance</span>
+                  <span style="font-size:0.68rem; color:var(--laser-cyan); font-weight:700;" data-i18n="qbCouponTag">Coupon -15% dans 1 an</span>
+                </label>
+                <input type="date" id="qb-child-dob" class="form-input">
+              </div>
+            </div>
+
+            <!-- Corporate & Team Building B2B subsection (Displayed in corporate mode) -->
+            <div id="qb-corporate-section" style="display:none; margin-top:14px; background:rgba(0,240,255,0.03); border:1px solid rgba(0,240,255,0.22); padding:14px 16px; border-radius:14px;">
+              <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+                <span style="font-size:0.8rem; font-weight:800; color:var(--laser-cyan); text-transform:uppercase; display:inline-flex; align-items:center; gap:6px;">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
+                  <span>Facturation Entreprise & Team Building (B2B)</span>
+                </span>
+                <span class="badge" style="background:rgba(0,240,255,0.12); color:var(--laser-cyan); font-size:0.7rem; font-weight:700;">VIES UE · KBO / BCE</span>
+              </div>
+
+              <!-- Company Name Search with Live Auto-Suggestions -->
+              <div class="form-group" style="position:relative; margin-bottom:12px;">
+                <label class="form-label" style="display:flex; justify-content:space-between;">
+                  <span data-i18n="companyName">Nom de l'entreprise</span>
+                  <span style="font-size:0.7rem; color:var(--text-secondary);">Recherche auto (Belgique & Pays-Bas)</span>
+                </label>
+                <div style="position:relative;">
+                  <input type="text" id="qb-company-name" class="form-input" placeholder="Tapez ex: Deloitte, Solvay, ASML, Proximus..." autocomplete="off">
+                  <div id="qb-company-spinner" style="position:absolute; right:12px; top:50%; transform:translateY(-50%); display:none;">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--laser-cyan)" stroke-width="2"><circle cx="12" cy="12" r="10" stroke-opacity="0.25"/><path d="M12 2a10 10 0 0 1 10 10"/></svg>
+                  </div>
+                </div>
+                <div id="qb-company-suggestions" class="autocomplete-dropdown" style="display:none; position:absolute; left:0; right:0; top:100%; background:var(--bg-surface); border:1px solid var(--border-medium); border-radius:10px; max-height:220px; overflow-y:auto; z-index:1000; box-shadow:var(--shadow-lg); margin-top:4px;"></div>
+              </div>
+
+              <!-- VAT / BTW Number with instant VIES check -->
+              <div style="display:grid; grid-template-columns:1.4fr 1fr; gap:12px; margin-bottom:12px;">
+                <div class="form-group" style="margin-bottom:0;">
+                  <label class="form-label">
+                    <span data-i18n="vatNumber">N° de TVA Intracommunautaire</span>
+                  </label>
+                  <div style="display:flex; gap:8px;">
+                    <input type="text" id="qb-vat-number" class="form-input" placeholder="Ex: BE 0477.123.456 ou NL8058..." autocomplete="off">
+                    <button type="button" class="btn btn-secondary btn-sm" id="btn-check-vies" style="white-space:nowrap; padding:6px 12px; font-weight:700; color:var(--laser-cyan); border-color:rgba(0,240,255,0.4);">
+                      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+                      <span data-i18n="vatLookupBtn">Vérifier</span>
+                    </button>
+                  </div>
+                </div>
+                <div class="form-group" style="margin-bottom:0;">
+                  <label class="form-label">Statut VIES / KBO</label>
+                  <div id="qb-vat-status" style="min-height:38px; display:flex; align-items:center; font-size:0.75rem; color:var(--text-secondary); background:rgba(255,255,255,0.03); border:1px dashed var(--border-subtle); border-radius:8px; padding:0 10px;">
+                    En attente de saisie...
+                  </div>
+                </div>
+              </div>
+
+              <!-- Billing Address with Google Maps / Places Autocomplete -->
+              <div class="form-group" style="position:relative; margin-bottom:12px;">
+                <label class="form-label" style="display:flex; justify-content:space-between;">
+                  <span data-i18n="billingAddress">Adresse de facturation</span>
+                  <span style="font-size:0.7rem; color:var(--laser-cyan); font-weight:700; display:inline-flex; align-items:center; gap:4px;">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                    Google Maps / Places
+                  </span>
+                </label>
+                <input type="text" id="qb-company-address" class="form-input" placeholder="Rue, N°, Code Postal, Ville, Pays (ex: Avenue Louise 149, 1050 Bruxelles)..." autocomplete="off">
+                <div id="qb-address-suggestions" class="autocomplete-dropdown" style="display:none; position:absolute; left:0; right:0; top:100%; background:var(--bg-surface); border:1px solid var(--border-medium); border-radius:10px; max-height:220px; overflow-y:auto; z-index:1000; box-shadow:var(--shadow-lg); margin-top:4px;"></div>
+              </div>
+
+              <!-- PO & Contact Role -->
+              <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
+                <div class="form-group" style="margin-bottom:0;">
+                  <label class="form-label" data-i18n="poNumber">N° Bon de commande (PO / Ref)</label>
+                  <input type="text" id="qb-po-number" class="form-input" placeholder="Ex: PO-2026-EU448">
+                </div>
+                <div class="form-group" style="margin-bottom:0;">
+                  <label class="form-label" data-i18n="contactRole">Fonction du contact</label>
+                  <input type="text" id="qb-contact-role" class="form-input" placeholder="Ex: Office Manager / HR">
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Section 2: Date, Slot & Players -->
+          <div class="modal-section">
+            <div class="modal-section-title">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+              <span data-i18n="qbSectionDateTime">Date, Créneau & Participants</span>
+            </div>
+            <div style="display:grid; grid-template-columns:1.2fr 1.5fr 1fr; gap:14px;">
+              <div class="form-group" style="margin-bottom:0;">
+                <label class="form-label"><span data-i18n="qbLabelDate">Date</span> <span class="required-star">*</span></label>
+                <input type="date" id="qb-date" class="form-input" required>
+              </div>
+              <div class="form-group" style="margin-bottom:0;">
+                <label class="form-label"><span data-i18n="qbLabelSlot">Créneau horaire</span> <span class="required-star">*</span></label>
+                <select id="qb-slot" class="form-input">
+                  <option value="14:00 - 16:00">14:00 - 16:00 (2h standard)</option>
+                  <option value="16:30 - 18:30">16:30 - 18:30 (2h standard)</option>
+                  <option value="11:00 - 14:00">11:00 - 14:00 (3h VIP)</option>
+                  <option value="15:00 - 18:00">15:00 - 18:00 (3h VIP)</option>
+                  <option value="18:00 - 20:00">18:00 - 20:00 (2h Team Building)</option>
+                  <option value="19:30 - 22:30">19:30 - 22:30 (Soirée Corporate VIP)</option>
+                  <option value="18:00 - 19:00">18:00 - 19:00 (1h Standard)</option>
+                </select>
+              </div>
+              <div class="form-group" style="margin-bottom:0;">
+                <label class="form-label"><span data-i18n="qbLabelPlayers">Joueurs</span> <span class="required-star">*</span></label>
+                <input type="number" id="qb-players" class="form-input" value="10" min="2" max="60" required>
+              </div>
+            </div>
+          </div>
+
+          <!-- Section 3: Package & Special Notes -->
+          <div class="modal-section" style="margin-bottom:0;">
+            <div class="modal-section-title">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m2 4 3 12h14l3-12-6 7-4-7-4 7-6-7zm3 16h14v1a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1v-1z"/></svg>
+              <span data-i18n="qbSectionPackage">Formule & Préférences</span>
+            </div>
+            <div class="form-group" style="margin-bottom:12px;">
+              <label class="form-label" data-i18n="qbLabelPackage">Formule choisie</label>
+              <select id="qb-package" class="form-input">
+                <option value="fun">Formule Fun (26 € / enfant · Frites & Fricadelle)</option>
+                <option value="sweet">Formule Sweet (24 € / enfant · Mix Donuts)</option>
+                <option value="vip">Formule VIP (28 € / enfant · Tenders + Glace + Kid Champagne)</option>
+                <option value="corporate">Team Building Pro (42 € / pers · 3 Parties + Finger Food & Open Bar Softs)</option>
+                <option value="standard2">Standard Laser (2 Parties Choc · 22 € / pers)</option>
+              </select>
+            </div>
+
+            <div class="form-group" style="margin-bottom:14px;">
+              <label class="form-label" data-i18n="qbLabelNotes">Remarques & Préférences</label>
+              <textarea id="qb-notes" class="form-textarea" rows="2" placeholder="Ex: 1 enfant allergique aux fruits à coque, souhait d'être placé table 3..."></textarea>
+            </div>
+
+            <!-- Live Calculated Price Preview -->
+            <div class="modal-price-strip">
+              <div class="modal-price-info">
+                <span class="modal-price-label" data-i18n="qbPriceEstimate">Estimation du Dossier</span>
+                <span class="modal-price-sub" id="qb-calc-breakdown">10 joueurs × 26 € · Règlement sur place le jour J</span>
+              </div>
+              <div class="modal-price-val" id="qb-calc-total">260 €</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="modal-foot">
+          <button type="button" class="btn btn-secondary" id="btn-cancel-quick-modal">
+            <span data-i18n="cancel">Annuler</span>
+          </button>
+          <button type="submit" class="btn btn-primary">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polyline points="20 6 9 17 4 12"/></svg>
+            <span data-i18n="qbSubmitBtn">Valider la réservation téléphonique</span>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL: Email Preview & Resend -->
+  <div class="modal-overlay" id="email-preview-modal">
+    <div class="modal-card" style="max-width: 720px; width: 95%;">
+      <div class="modal-head">
+        <div style="display:flex; align-items:center; gap:8px;">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
+          <h3 id="email-preview-title">Aperçu de l'E-mail de Confirmation Client</h3>
+        </div>
+        <button type="button" class="btn btn-secondary btn-sm" id="btn-close-email-modal" aria-label="Fermer">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      </div>
+      <div class="modal-body" style="padding: 16px 24px; max-height: 70vh; overflow-y: auto;" id="email-preview-body">
+        <!-- Rendered HTML email iframe/content -->
+      </div>
+      <div class="modal-foot" style="display:flex; justify-content:space-between; align-items:center; padding: 14px 24px; background:var(--bg-surface); border-top:1px solid var(--border-subtle);">
+        <button type="button" class="btn btn-secondary btn-sm" id="btn-copy-magic-link">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>
+          <span>Copier le lien magique client</span>
+        </button>
+        <button type="button" class="btn btn-primary btn-sm" id="btn-send-simulated-email">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+          <span>Renvoyer l'e-mail</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: Birthday 1-Year Loyalty Marketing Coupon Preview -->
+  <div class="modal-overlay" id="birthday-coupon-modal">
+    <div class="modal-card" style="max-width: 720px; width: 95%;">
+      <div class="modal-head" style="border-bottom: 2px solid var(--laser-pink);">
+        <div style="display:flex; align-items:center; gap:10px;">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" style="color:var(--laser-pink);"><path d="M20 21v-8a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8"/><path d="M4 16s.5-1 2-1 2.5 2 4 2 2.5-2 4-2 2.5 2 4 2 2-1 2-1"/><line x1="2" y1="21" x2="22" y2="21"/><line x1="12" y1="4" x2="12" y2="7"/><line x1="8" y1="5" x2="8" y2="7"/><line x1="16" y1="5" x2="16" y2="7"/></svg>
+          <div>
+            <h3 id="birthday-coupon-title" style="margin:0; font-size:1.15rem; color:var(--text-white);">Campagne E-mail Anniversaire Automatisée</h3>
+            <span style="font-size:0.75rem; color:var(--text-secondary);">Relance fidélité 1 an après avec code promo -15% (J-30)</span>
+          </div>
+        </div>
+        <button type="button" class="btn btn-secondary btn-sm" id="btn-close-birthday-modal" aria-label="Fermer">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      </div>
+      <div class="modal-body" style="padding: 16px 24px; max-height: 70vh; overflow-y: auto;" id="birthday-coupon-body">
+        <!-- Rendered birthday campaign preview & HTML email iframe -->
+      </div>
+      <div class="modal-foot" style="display:flex; justify-content:space-between; align-items:center; padding: 14px 24px; background:var(--bg-surface); border-top:1px solid var(--border-subtle); flex-wrap:wrap; gap:10px;">
+        <button type="button" class="btn btn-secondary btn-sm" id="btn-schedule-birthday-coupon" style="color:var(--laser-cyan); border-color:rgba(0,240,255,0.35);">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+          <span>Activer la relance automatique (J-30)</span>
+        </button>
+        <button type="button" class="btn btn-primary btn-sm" id="btn-send-birthday-coupon" style="background:linear-gradient(135deg, #ff1b7b 0%, #ff5252 100%); border-color:transparent;">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+          <span>Envoyer le coupon -15% maintenant</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: Bar POS & Consommations (Fiche Client / Ardoise) -->
+  <div class="modal-overlay" id="bar-pos-modal">
+    <div class="modal-card pos-modal-card" style="max-width: 1140px; width: 96%; max-height: 92vh; display:flex; flex-direction:column;">
+      <div class="modal-head" style="flex-shrink:0;">
+        <div style="display:flex; align-items:center; gap:10px;">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="pos-head-icon" style="color:var(--laser-cyan);"><path d="M18 8h1a4 4 0 0 1 0 8h-1"/><path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"/><line x1="6" y1="1" x2="6" y2="4"/><line x1="10" y1="1" x2="10" y2="4"/><line x1="14" y1="1" x2="14" y2="4"/></svg>
+          <div>
+            <h3 id="bar-pos-modal-title" style="margin:0; font-size:1.15rem; font-weight:800;" data-i18n="barPosTitle">Fiche Consommations & Caisse Bar</h3>
+            <span style="font-size:0.75rem; color:var(--text-secondary);" data-i18n="barPosSub">Sélectionnez les boissons et snacks sur l'ardoise de la table</span>
+          </div>
+        </div>
+        <button type="button" class="btn btn-secondary btn-sm" id="btn-close-bar-pos" aria-label="Fermer">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      </div>
+      <div class="modal-body" style="padding: 16px 20px; flex:1; overflow: hidden;" id="bar-pos-modal-body">
+        <!-- Injected via barPos.js renderPosModalContent -->
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: Client File CRM Drawer -->
+  <div class="modal-overlay" id="client-crm-modal">
+    <div class="modal-card" style="max-width: 820px; width: 95%;">
+      <div class="modal-head" style="border-bottom: 2px solid var(--laser-cyan);">
+        <div style="display:flex; align-items:center; gap:10px;">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--laser-cyan)" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+          <div>
+            <h3 id="crm-modal-name" style="margin:0; font-size:1.2rem; color:var(--text-white);">Fiche Client CRM</h3>
+            <span id="crm-modal-subtitle" style="font-size:0.75rem; color:var(--text-secondary);">Détail complet du compte et historique des réservations</span>
+          </div>
+        </div>
+        <button type="button" class="btn btn-secondary btn-sm" id="btn-close-crm-modal" aria-label="Fermer">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      </div>
+      <div class="modal-body" style="padding: 20px 24px; max-height: 75vh; overflow-y: auto;" id="crm-modal-content">
+        <!-- Injected via JavaScript -->
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: Table QR Chevalets & Print -->
+  <div class="modal-overlay" id="table-qrs-modal">
+    <div class="modal-card" style="max-width: 960px; width: 95%; max-height: 90vh; display:flex; flex-direction:column;">
+      <div class="modal-head" style="border-bottom: 2px solid var(--laser-cyan);">
+        <div style="display:flex; align-items:center; gap:10px;">
+          <div style="width:36px; height:36px; border-radius:10px; background:rgba(0,240,255,0.12); color:var(--laser-cyan); display:flex; align-items:center; justify-content:center; border:1px solid rgba(0,240,255,0.3);">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+          </div>
+          <div>
+            <h3 style="margin:0; font-size:1.2rem; color:var(--text-white);">Chevalets QR Codes - Tables 1 à 8</h3>
+            <span style="font-size:0.75rem; color:var(--text-secondary);">Chaque QR code dirige vers le menu mobile et se connecte à la réservation active</span>
+          </div>
+        </div>
+        <div style="display:flex; align-items:center; gap:8px;">
+          <button type="button" class="btn btn-primary btn-sm" id="btn-trigger-print-qrs" onclick="window.printTableQrs()" style="background:var(--laser-cyan); color:#04070f; font-weight:800; display:inline-flex; align-items:center; gap:6px;">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+            <span>Imprimer les 8 Chevalets</span>
+          </button>
+          <button type="button" class="btn btn-secondary btn-sm" id="btn-close-table-qrs-modal" onclick="window.closeTableQrModal()" aria-label="Fermer">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+          </button>
+        </div>
+      </div>
+
+      <div class="modal-body" style="padding: 20px 24px; overflow-y: auto; flex:1;" id="table-qrs-grid-container">
+        <!-- Injected via JavaScript with vector SVG QR codes -->
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: Amelia CSV Customer Import -->
+  <div class="modal-overlay" id="amelia-import-modal">
+    <div class="modal-card" style="max-width: 860px; width: 95%;">
+      <div class="modal-head" style="border-bottom: 2px solid var(--laser-cyan);">
+        <div style="display:flex; align-items:center; gap:10px;">
+          <div style="width:36px; height:36px; border-radius:10px; background:rgba(0,240,255,0.12); color:var(--laser-cyan); display:flex; align-items:center; justify-content:center; border:1px solid rgba(0,240,255,0.3);">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+          </div>
+          <div>
+            <h3 style="margin:0; font-size:1.2rem; color:var(--text-white);" data-i18n="ameliaModalTitle">Importation Clients Amelia (WordPress)</h3>
+            <span style="font-size:0.75rem; color:var(--text-secondary);" data-i18n="ameliaModalSub">Glissez-déposez l'export CSV d'Amelia ou collez les données brutes</span>
+          </div>
+        </div>
+        <button type="button" class="btn btn-secondary btn-sm" id="btn-close-amelia-modal" aria-label="Fermer">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      </div>
+
+      <div class="modal-body" style="padding: 20px 24px; max-height: 75vh; overflow-y: auto;">
+        <!-- Drag & Drop Zone -->
+        <div id="amelia-drop-zone" style="border: 2px dashed rgba(0, 240, 255, 0.4); border-radius: var(--radius-xl); padding: 30px 20px; text-align: center; background: rgba(0, 240, 255, 0.03); cursor: pointer; transition: all var(--transition-fast);">
+          <input type="file" id="amelia-file-input" accept=".csv,text/csv,text/plain" style="display:none;">
+          <div style="width:48px; height:48px; border-radius:50%; background:rgba(0,240,255,0.12); color:var(--laser-cyan); display:inline-flex; align-items:center; justify-content:center; margin-bottom:12px;">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="18" x2="12" y2="12"/><line x1="9" y1="15" x2="15" y2="15"/></svg>
+          </div>
+          <h4 style="margin:0 0 6px 0; font-size:1.05rem; color:var(--text-white);" data-i18n="ameliaDropTitle">Glissez-déposez le fichier CSV Amelia ici</h4>
+          <p style="margin:0 0 14px 0; font-size:0.82rem; color:var(--text-secondary);" data-i18n="ameliaDropSub">Compatible avec l'export natif WordPress (WordPress -> Amelia -> Customers -> Export)</p>
+          <div style="display:flex; justify-content:center; gap:10px; flex-wrap:wrap;">
+            <button type="button" class="btn btn-secondary btn-sm" id="btn-browse-amelia-file">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+              <span>Parcourir mes fichiers...</span>
+            </button>
+            <button type="button" class="btn btn-secondary btn-sm" id="btn-download-amelia-sample" style="color:var(--laser-cyan); border-color:rgba(0,240,255,0.3);">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+              <span>Télécharger Modèle CSV Amelia</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Options Box -->
+        <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap:12px; margin-top:16px; background:var(--bg-surface); padding:14px 18px; border-radius:14px; border:1px solid var(--border-subtle);">
+          <label style="display:flex; align-items:center; gap:8px; font-size:0.82rem; color:var(--text-primary); cursor:pointer;">
+            <input type="checkbox" id="amelia-opt-phone" checked style="accent-color:var(--laser-cyan);">
+            <span>Normalisation numéros belges (+32 4XX XX XX XX)</span>
+          </label>
+          <label style="display:flex; align-items:center; gap:8px; font-size:0.82rem; color:var(--text-primary); cursor:pointer;">
+            <input type="checkbox" id="amelia-opt-children" checked style="accent-color:var(--laser-cyan);">
+            <span>Détection intelligente enfants & anniversaires</span>
+          </label>
+          <label style="display:flex; align-items:center; gap:8px; font-size:0.82rem; color:var(--text-primary); cursor:pointer;">
+            <input type="checkbox" id="amelia-opt-merge" checked style="accent-color:var(--laser-cyan);">
+            <span>Fusionner avec les clients existants</span>
+          </label>
+        </div>
+
+        <!-- Or Paste CSV Directly Toggle -->
+        <div style="margin-top:14px;">
+          <details style="font-size:0.82rem; color:var(--text-secondary);">
+            <summary style="cursor:pointer; font-weight:700; color:var(--laser-cyan);">Ou coller manuellement le texte CSV brut...</summary>
+            <div style="margin-top:10px;">
+              <textarea id="amelia-paste-textarea" class="form-input" rows="4" placeholder="Id,First Name,Last Name,Email,Phone,Note..." style="width:100%; font-family:monospace; font-size:0.8rem; padding:10px; border-radius:10px;"></textarea>
+              <button type="button" class="btn btn-secondary btn-sm" id="btn-parse-pasted-csv" style="margin-top:8px;">
+                <span>Analyser le texte collé</span>
+              </button>
+            </div>
+          </details>
+        </div>
+
+        <!-- Live Preview Container -->
+        <div id="amelia-preview-area" style="display:none; margin-top:20px; border-top:1px solid var(--border-subtle); padding-top:16px;">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; flex-wrap:wrap; gap:10px;">
+            <div style="display:flex; align-items:center; gap:8px;">
+              <span class="badge" id="amelia-preview-count-badge" style="background:rgba(0,255,136,0.15); color:var(--laser-green); font-size:0.85rem; font-weight:800; padding:4px 10px;">
+                0 clients détectés
+              </span>
+              <span style="font-size:0.8rem; color:var(--text-secondary);" id="amelia-preview-filename"></span>
+            </div>
+            <button type="button" class="btn btn-secondary btn-sm" id="btn-clear-amelia-preview" style="font-size:0.75rem;">
+              Effacer / Nouveau fichier
+            </button>
+          </div>
+
+          <div style="overflow-x:auto; border-radius:12px; border:1px solid var(--border-subtle); max-height:280px; overflow-y:auto;">
+            <table class="data-table" style="font-size:0.82rem; margin:0;" id="amelia-preview-table">
+              <thead>
+                <tr>
+                  <th>Client</th>
+                  <th>Téléphone Normalisé</th>
+                  <th>E-mail</th>
+                  <th>Entreprise / TVA</th>
+                  <th>Enfants Détectés</th>
+                  <th>Notes</th>
+                </tr>
+              </thead>
+              <tbody id="amelia-preview-tbody">
+                <!-- Injected via JavaScript -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-footer" style="padding: 14px 24px; border-top: 1px solid var(--border-subtle); display:flex; justify-content:space-between; align-items:center;">
+        <button type="button" class="btn btn-secondary" id="btn-cancel-amelia-modal">Annuler</button>
+        <button type="button" class="btn btn-primary" id="btn-confirm-amelia-import" disabled style="display:inline-flex; align-items:center; gap:8px;">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+          <span id="btn-confirm-amelia-text">Importer les clients dans le CRM</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast notification -->
+  <div class="toast-popup" id="admin-toast" style="position:fixed; bottom:24px; right:24px; background:var(--laser-green); color:#04070f; font-weight:700; padding:12px 22px; border-radius:var(--radius-full); box-shadow:0 8px 24px rgba(0,255,136,0.35); display:none; z-index:99999;"></div>
+
+  <script type="module">
+    import { initAdmin } from './src/admin.js';
+    initAdmin();
+  </script>
+</body>
+</html>

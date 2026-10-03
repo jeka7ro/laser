@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Démo Intégration Iframe - Laser Magic (lasermagic.be)</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="./src/styles/theme.css">
+  <style>
+    /* Demo Simulator Toolbar */
+    .demo-bar {
+      position: sticky;
+      top: 0;
+      z-index: 9999;
+      background: #04070f;
+      border-bottom: 2px solid var(--laser-cyan);
+      padding: 10px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      color: #fff;
+      font-size: 0.85rem;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.8);
+    }
+    .demo-bar-left {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+    .demo-tag {
+      background: rgba(0, 240, 255, 0.15);
+      border: 1px solid var(--laser-cyan);
+      color: var(--laser-cyan);
+      padding: 3px 10px;
+      border-radius: var(--radius-full);
+      font-weight: 700;
+      font-size: 0.75rem;
+      letter-spacing: 0.05em;
+    }
+    .device-switcher {
+      display: flex;
+      gap: 6px;
+      background: var(--bg-card);
+      padding: 3px;
+      border-radius: var(--radius-full);
+      border: 1px solid var(--border-subtle);
+    }
+    .device-btn {
+      background: transparent;
+      border: none;
+      color: var(--text-secondary);
+      padding: 4px 12px;
+      border-radius: var(--radius-full);
+      font-size: 0.8rem;
+      cursor: pointer;
+      font-weight: 600;
+      transition: all 0.2s;
+    }
+    .device-btn.active {
+      background: var(--laser-cyan);
+      color: #04070f;
+    }
+
+    /* Webflow Mock Page Styles (replicating lasermagic.be) */
+    .mock-webflow-page {
+      background: #080d1a;
+      min-height: 100vh;
+      color: #fff;
+      transition: all 0.3s ease;
+      margin: 0 auto;
+    }
+
+    .mock-header {
+      padding: 20px 40px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+      background: rgba(8, 13, 26, 0.8);
+    }
+    .mock-nav {
+      display: flex;
+      gap: 24px;
+      list-style: none;
+      font-size: 0.9rem;
+      color: #cbd5e1;
+    }
+
+    .mock-hero {
+      padding: 80px 40px 60px 40px;
+      text-align: center;
+      max-width: 900px;
+      margin: 0 auto;
+    }
+    .mock-hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 16px;
+      border-radius: var(--radius-full);
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      font-size: 0.85rem;
+      color: #94a3b8;
+      margin-bottom: 20px;
+    }
+    .mock-hero h1 {
+      font-size: 2.8rem;
+      text-transform: uppercase;
+      line-height: 1.15;
+      margin-bottom: 16px;
+    }
+    .mock-hero p {
+      font-size: 1.1rem;
+      color: #94a3b8;
+      line-height: 1.6;
+    }
+
+    /* Target Iframe Section */
+    .mock-reservation-section {
+      padding: 60px 20px 100px 20px;
+      background: radial-gradient(circle at 50% 10%, rgba(0, 240, 255, 0.06) 0%, #04070f 60%);
+      border-top: 1px solid rgba(255, 255, 255, 0.08);
+    }
+    .reservation-container {
+      max-width: 1000px;
+      margin: 0 auto;
+    }
+    .res-section-title {
+      text-align: center;
+      margin-bottom: 40px;
+    }
+    .res-section-title h2 {
+      font-size: 2.2rem;
+      text-transform: uppercase;
+      margin-bottom: 8px;
+    }
+    .res-section-title p {
+      color: #94a3b8;
+      max-width: 600px;
+      margin: 0 auto;
+    }
+
+    /* Embedded Iframe Container */
+    .embedded-frame-wrapper {
+      width: 100%;
+      border-radius: var(--radius-xl);
+      overflow: hidden;
+      box-shadow: 0 25px 60px rgba(0,0,0,0.9);
+    }
+
+    #embedded-booking-frame {
+      width: 100%;
+      min-height: 820px;
+      border: none;
+      display: block;
+      background: transparent;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top Simulator Bar -->
+  <div class="demo-bar">
+    <div class="demo-bar-left">
+      <span class="demo-tag">SIMULATION IFRAME WEBFLOW</span>
+      <span>Aperçu en direct de l'intégration sur <strong>lasermagic.be/anniversaire-enfants#reservation</strong></span>
+    </div>
+
+    <div style="display:flex; align-items:center; gap:16px;">
+      <!-- Device Viewport Switcher -->
+      <div class="device-switcher">
+        <button type="button" class="device-btn active" data-device="desktop">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="2" y1="20" x2="22" y2="20"/></svg>
+          <span>Desktop</span>
+        </button>
+        <button type="button" class="device-btn" data-device="tablet">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><rect x="4" y="2" width="16" height="20" rx="2" ry="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg>
+          <span>Tablet (768px)</span>
+        </button>
+        <button type="button" class="device-btn" data-device="mobile">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><rect x="5" y="2" width="14" height="20" rx="2" ry="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg>
+          <span>Mobile (390px)</span>
+        </button>
+      </div>
+
+      <!-- Jump to Back-Office -->
+      <a href="./index.html" class="btn btn-primary btn-sm">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><path d="M18 20V10M12 20V4M6 20v-6"/></svg>
+        <span>Back-Office Pro</span>
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="7" y1="17" x2="17" y2="7"/><polyline points="7 7 17 7 17 17"/></svg>
+      </a>
+    </div>
+  </div>
+
+  <!-- Mock Webflow Client Site -->
+  <div class="mock-webflow-page" id="mock-page-container">
+    <!-- Header -->
+    <header class="mock-header">
+      <img src="https://cdn.prod.website-files.com/6a5dfddc421d6120331d50f5/6a732659b500bebf3241f2b9_Laser-Magic-Logo.png" alt="Laser Magic" height="40" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' width=\'140\' height=\'30\'><text x=\'0\' y=\'22\' fill=\'%2300f0ff\' font-weight=\'bold\' font-size=\'18\'>LASER MAGIC</text></svg>'">
+      <ul class="mock-nav">
+        <li>Activités</li>
+        <li>Occasions</li>
+        <li>Tarifs</li>
+        <li>Infos & FAQ</li>
+      </ul>
+      <a href="#reservation" class="btn btn-secondary btn-sm" style="border-radius:var(--radius-full);">
+        Réserver une partie
+      </a>
+    </header>
+
+    <!-- Hero -->
+    <section class="mock-hero">
+      <div class="mock-hero-badge">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
+        <span>Vilvoorde, à 15 min de Bruxelles</span>
+      </div>
+      <h1>Anniversaire enfant près de Bruxelles : laser game</h1>
+      <p>
+        Vous cherchez une idée d'anniversaire inoubliable pour votre enfant ? Deux parties de laser game dans nos arènes Jungle & Prison, un goûter à table et l'animation avec musique et feu de bengale.
+      </p>
+    </section>
+
+    <!-- Reservation Section replacing Amelia with our New Widget Iframe -->
+    <section class="mock-reservation-section" id="reservation">
+      <div class="reservation-container">
+        <div class="res-section-title">
+          <h2>Réservez un anniversaire enfant</h2>
+          <p>Choisissez votre formule, votre créneau en direct et réglez l'acompte en ligne en toute sécurité.</p>
+        </div>
+
+        <!-- The Responsive Iframe Embedded Container -->
+        <div class="embedded-frame-wrapper">
+          <iframe 
+            id="embedded-booking-frame" 
+            src="./widget.html" 
+            title="Laser Magic Booking Widget"
+            allow="payment"
+          ></iframe>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <script>
+    // Responsive device switcher logic
+    const mockContainer = document.getElementById('mock-page-container');
+    document.querySelectorAll('.device-btn').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        document.querySelectorAll('.device-btn').forEach(b => b.classList.remove('active'));
+        e.currentTarget.classList.add('active');
+        const dev = e.currentTarget.dataset.device;
+
+        if (dev === 'mobile') {
+          mockContainer.style.maxWidth = '420px';
+          mockContainer.style.boxShadow = '0 0 50px rgba(0,0,0,0.9)';
+          mockContainer.style.borderRadius = '32px';
+          mockContainer.style.marginTop = '20px';
+          mockContainer.style.border = '8px solid #222';
+        } else if (dev === 'tablet') {
+          mockContainer.style.maxWidth = '768px';
+          mockContainer.style.boxShadow = '0 0 50px rgba(0,0,0,0.9)';
+          mockContainer.style.borderRadius = '24px';
+          mockContainer.style.marginTop = '20px';
+          mockContainer.style.border = '8px solid #222';
+        } else {
+          mockContainer.style.maxWidth = '100%';
+          mockContainer.style.boxShadow = 'none';
+          mockContainer.style.borderRadius = '0';
+          mockContainer.style.marginTop = '0';
+          mockContainer.style.border = 'none';
+        }
+      });
+    });
+
+    // Handle postMessage auto-height from widget iframe
+    window.addEventListener('message', function(event) {
+      if (event.data && event.data.type === 'LASER_MAGIC_IFRAME_RESIZE') {
+        const frame = document.getElementById('embedded-booking-frame');
+        if (frame && event.data.height) {
+          const clamped = Math.min(Math.max(event.data.height, 650), 1400);
+          frame.style.height = clamped + 'px';
+        }
+      }
+    });
+  </script>
+</body>
+</html>

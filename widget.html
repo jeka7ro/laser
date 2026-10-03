@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Laser Magic - Réservation en Ligne</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="./src/styles/widget.css">
+</head>
+<body class="widget-body">
+
+  <div class="widget-container">
+    <!-- Header -->
+    <header class="widget-header">
+      <div class="widget-brand">
+        <img src="https://cdn.prod.website-files.com/6a5dfddc421d6120331d50f5/6a732659b500bebf3241f2b9_Laser-Magic-Logo.png" alt="Laser Magic Logo" class="widget-logo" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' width=\'160\' height=\'40\' viewBox=\'0 0 160 40\'><text x=\'0\' y=\'28\' fill=\'%2300f0ff\' font-family=\'sans-serif\' font-weight=\'bold\' font-size=\'22\'>LASER MAGIC</text></svg>'">
+        <div class="widget-brand-info">
+          <h1>Laser Magic</h1>
+          <p><span class="pulse-dot"></span> <span data-i18n="locationTag">Vilvoorde · 15 min de Bruxelles</span></p>
+        </div>
+      </div>
+
+      <!-- Language Selector -->
+      <div class="lang-selector">
+        <button type="button" class="lang-btn active" data-lang="fr" title="Français">
+          <svg class="flag-icon flag-fr" width="15" height="10" viewBox="0 0 3 2" style="border-radius:2px; flex-shrink:0; display:inline-block; vertical-align:middle; box-shadow:0 0 0 1px rgba(255,255,255,0.2); overflow:hidden;" aria-hidden="true"><rect width="1" height="2" fill="#002654"/><rect x="1" width="1" height="2" fill="#FFFFFF"/><rect x="2" width="1" height="2" fill="#CE1126"/></svg>
+          <span>FR</span>
+        </button>
+        <button type="button" class="lang-btn" data-lang="nl" title="Nederlands">
+          <svg class="flag-icon flag-nl" width="15" height="10" viewBox="0 0 3 2" style="border-radius:2px; flex-shrink:0; display:inline-block; vertical-align:middle; box-shadow:0 0 0 1px rgba(255,255,255,0.2); overflow:hidden;" aria-hidden="true"><rect width="3" height="0.67" fill="#AE1C28"/><rect y="0.67" width="3" height="0.66" fill="#FFFFFF"/><rect y="1.33" width="3" height="0.67" fill="#21468B"/></svg>
+          <span>NL</span>
+        </button>
+        <button type="button" class="lang-btn" data-lang="en" title="English">
+          <svg class="flag-icon flag-en" width="15" height="10" viewBox="0 0 60 30" style="border-radius:2px; flex-shrink:0; display:inline-block; vertical-align:middle; box-shadow:0 0 0 1px rgba(255,255,255,0.2); overflow:hidden;" aria-hidden="true"><rect width="60" height="30" fill="#012169"/><path d="M0,0 L60,30 M60,0 L0,30" stroke="#fff" stroke-width="6"/><path d="M0,0 L60,30 M60,0 L0,30" stroke="#C8102E" stroke-width="3"/><path d="M30,0 v30 M0,15 h60" stroke="#fff" stroke-width="10"/><path d="M30,0 v30 M0,15 h60" stroke="#C8102E" stroke-width="6"/></svg>
+          <span>EN</span>
+        </button>
+      </div>
+    </header>
+
+    <!-- Wizard Steps Indicator -->
+    <nav class="wizard-steps" aria-label="Étapes de réservation">
+      <div class="wizard-step active" data-step-indicator="1">
+        <div class="step-num">1</div>
+        <div class="step-labels">
+          <span class="step-title" data-i18n="step1Title">Formule</span>
+          <span class="step-desc" data-i18n="step1Desc">Choisissez votre activité</span>
+        </div>
+      </div>
+      <div class="wizard-step" data-step-indicator="2">
+        <div class="step-num">2</div>
+        <div class="step-labels">
+          <span class="step-title" data-i18n="step2Title">Date & Heure</span>
+          <span class="step-desc" data-i18n="step2Desc">Créneaux en direct</span>
+        </div>
+      </div>
+      <div class="wizard-step" data-step-indicator="3">
+        <div class="step-num">3</div>
+        <div class="step-labels">
+          <span class="step-title" data-i18n="step3Title">Options & Extras</span>
+          <span class="step-desc" data-i18n="step3Desc">Personnalisez la fête</span>
+        </div>
+      </div>
+      <div class="wizard-step" data-step-indicator="4">
+        <div class="step-num">4</div>
+        <div class="step-labels">
+          <span class="step-title" data-i18n="step4Title">Coordonnées</span>
+          <span class="step-desc" data-i18n="step4Desc">Validation & Acompte</span>
+        </div>
+      </div>
+    </nav>
+
+    <!-- Wizard Main Content -->
+    <main class="wizard-content">
+      <!-- STEP 1: Packages -->
+      <section class="step-section active" id="step-1">
+        <div class="section-head">
+          <h2 data-i18n="step1Desc">Choisissez votre activité</h2>
+          <p>Profitez de nos 2 arènes laser game (Jungle & Prison), de notre minigolf et de nos formules tout compris.</p>
+        </div>
+
+        <!-- Category Filter Tabs -->
+        <div class="category-tabs">
+          <button type="button" class="cat-tab active" data-category="birthday" data-i18n="categoryBirthdays">Anniversaires Enfants (7-15 ans)</button>
+          <button type="button" class="cat-tab" data-category="games" data-i18n="categoryGames">Parties Laser (min. 10 pers.)</button>
+          <button type="button" class="cat-tab" data-category="quick" data-i18n="categoryQuick">Formule Flash EVG / Amis</button>
+          <button type="button" class="cat-tab" data-category="dinner" data-i18n="categoryDinner">Dîner Laser & Soirée</button>
+        </div>
+
+        <!-- Package Cards Container -->
+        <div class="package-grid" id="package-cards-container">
+          <!-- Injected via JavaScript -->
+        </div>
+      </section>
+
+      <!-- STEP 2: Calendar & Available Slots -->
+      <section class="step-section" id="step-2">
+        <div class="section-head">
+          <h2 data-i18n="step2Title">Date & Heure</h2>
+          <p data-i18n="step2Desc">Sélectionnez la date et l'horaire de votre partie dans nos arènes.</p>
+        </div>
+
+        <div class="calendar-layout">
+          <!-- Interactive Calendar Box -->
+          <div class="calendar-box">
+            <div class="calendar-nav">
+              <button type="button" class="cal-nav-btn" id="cal-prev-month">‹</button>
+              <div class="calendar-month-title" id="cal-month-title">Octobre 2026</div>
+              <button type="button" class="cal-nav-btn" id="cal-next-month">›</button>
+            </div>
+            <div class="calendar-weekdays">
+              <span>Lun</span><span>Mar</span><span>Mer</span><span>Jeu</span><span>Ven</span><span>Sam</span><span>Dim</span>
+            </div>
+            <div class="calendar-grid" id="cal-days-grid">
+              <!-- Injected via JavaScript -->
+            </div>
+          </div>
+
+          <!-- Slots Selection Box -->
+          <div class="slots-box">
+            <h3 class="slots-title" data-i18n="selectTime">2. Choisissez votre créneau</h3>
+            <p class="slots-subtitle" data-i18n="minPlayersNotice">Minimum requis : 8 enfants (tolérance de facturation appliquée)</p>
+            <div class="slots-list" id="slots-container">
+              <!-- Injected via JavaScript -->
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- STEP 3: Customization & Add-ons -->
+      <section class="step-section" id="step-3">
+        <div class="section-head">
+          <h2 data-i18n="step3Title">Options & Extras</h2>
+          <p data-i18n="guestNotice">Indiquez l'estimation la plus précise. Ajustable jusqu'au jour J selon les conditions du centre.</p>
+        </div>
+
+        <div class="customization-grid">
+          <!-- Players Count & Child Info -->
+          <div class="counter-card">
+            <label class="form-label" data-i18n="playersCountLabel">Nombre de participants :</label>
+            <div class="counter-row">
+              <span style="font-size:0.9rem; color:var(--text-secondary);">Nombre d'enfants prévus :</span>
+              <div class="counter-controls">
+                <button type="button" class="counter-btn" id="btn-dec-players">-</button>
+                <span class="counter-val" id="players-count-val">10</span>
+                <button type="button" class="counter-btn" id="btn-inc-players">+</button>
+              </div>
+            </div>
+
+            <!-- Birthday Child Fields -->
+            <div id="birthday-child-fields" style="margin-top: 24px;">
+              <div class="form-group">
+                <label class="form-label" data-i18n="childCelebratedName">Prénom de l'enfant qui fête son anniversaire :</label>
+                <input type="text" id="input-child-name" class="form-input" placeholder="Ex: Lucas">
+              </div>
+              <div style="display:grid; grid-template-columns:1fr 1.4fr; gap:12px;">
+                <div class="form-group" style="margin-bottom:0;">
+                  <label class="form-label" data-i18n="childrenAgeLabel">Âge fêté :</label>
+                  <input type="number" id="input-child-age" class="form-input" value="10" min="7" max="17">
+                </div>
+                <div class="form-group" style="margin-bottom:0;">
+                  <label class="form-label" style="display:flex; justify-content:space-between; align-items:center;">
+                    <span>Date de naissance :</span>
+                    <span style="font-size:0.7rem; color:var(--laser-cyan); font-weight:700;">Cadeau VIP 1 an</span>
+                  </label>
+                  <input type="date" id="input-child-dob" class="form-input">
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Add-ons Selection -->
+          <div class="addons-card">
+            <div style="margin-bottom: 14px;">
+              <h3 style="font-size:1.15rem; margin-bottom: 4px;" data-i18n="addonsTitle">Personnalisez votre événement :</h3>
+              <p style="font-size:0.84rem; color:var(--text-muted);" data-i18n="addonsSubtitle">Options et activités complémentaires avec calcul en temps réel.</p>
+            </div>
+
+            <div class="addons-list">
+              <!-- Addon 1: Extra Laser Game -->
+              <div class="addon-row" id="addon-laser" data-addon="extra_laser">
+                <div class="addon-thumb-wrap">
+                  <img src="/images/addon-laser.avif" alt="Laser Game Fluo" class="addon-thumb" loading="lazy">
+                  <span class="addon-tag-pill" data-i18n="tagLaserArena">Arène Fluo</span>
+                </div>
+                <div class="addon-info">
+                  <div class="addon-head-row">
+                    <span class="addon-name" data-i18n="addonLaserGame">Partie de Laser Game supplémentaire</span>
+                    <span class="addon-price-badge" data-i18n="addonLaserGamePrice">+7 € / pers.</span>
+                  </div>
+                  <span class="addon-sub" data-i18n="addonLaserGameSub">Session extra de 15/20 min dans l'arène fluo Jungle / Prison</span>
+                  <div class="addon-calc-tag"><span id="addon-laser-calc">+70 € pour 10 joueurs</span></div>
+                </div>
+                <div class="custom-chk"></div>
+              </div>
+
+              <!-- Addon 2: Extra Minigolf -->
+              <div class="addon-row" id="addon-minigolf" data-addon="extra_minigolf">
+                <div class="addon-thumb-wrap">
+                  <img src="/images/addon-minigolf-real.avif" alt="Mini-Golf Outdoor" class="addon-thumb" loading="lazy">
+                  <span class="addon-tag-pill" data-i18n="tagOutdoor">Plein Air</span>
+                </div>
+                <div class="addon-info">
+                  <div class="addon-head-row">
+                    <span class="addon-name" data-i18n="addonMiniGolf">Partie de Mini-Golf supplémentaire</span>
+                    <span class="addon-price-badge" data-i18n="addonMiniGolfPrice">+7 € / pers.</span>
+                  </div>
+                  <span class="addon-sub" data-i18n="addonMiniGolfSub">Parcours 12 trous paysager extérieur (par beau temps)</span>
+                  <div class="addon-calc-tag"><span id="addon-minigolf-calc">+70 € pour 10 joueurs</span></div>
+                </div>
+                <div class="custom-chk"></div>
+              </div>
+
+              <!-- Addon 3: Birthday Cake -->
+              <div class="addon-row" id="addon-cake" data-addon="cake">
+                <div class="addon-thumb-wrap">
+                  <img src="/images/addon-cake.jpg" alt="Gâteau Chocolat" class="addon-thumb" loading="lazy">
+                  <span class="addon-tag-pill" data-i18n="tagGourmet">Gourmand</span>
+                </div>
+                <div class="addon-info">
+                  <div class="addon-head-row">
+                    <span class="addon-name" data-i18n="addonCake">Gâteau au chocolat maison avec bougies</span>
+                    <span class="addon-price-badge" data-i18n="addonCakePrice">+6 € / pers.</span>
+                  </div>
+                  <span class="addon-sub" data-i18n="addonCakeSub">Gâteau artisanal avec fontaine scintillante et bougies</span>
+                  <div class="addon-calc-tag"><span id="addon-cake-calc">+60 € pour 10 joueurs</span></div>
+                </div>
+                <div class="custom-chk"></div>
+              </div>
+
+              <!-- Addon 4: Castle & Commando Course -->
+              <div class="addon-row" id="addon-castle" data-addon="castle">
+                <div class="addon-thumb-wrap">
+                  <img src="/images/addon-military.jpg" alt="Château gonflable" class="addon-thumb" loading="lazy">
+                  <span class="addon-tag-pill" data-i18n="tagFun">Aventure</span>
+                </div>
+                <div class="addon-info">
+                  <div class="addon-head-row">
+                    <span class="addon-name" data-i18n="addonCastle">Château gonflable & Parcours commando</span>
+                    <span class="addon-price-badge" data-i18n="addonCastlePrice">+2 € / pers.</span>
+                  </div>
+                  <span class="addon-sub" data-i18n="addonCastleSub">Structure gonflable géante et parcours aventure extérieur (par beau temps)</span>
+                  <div class="addon-calc-tag"><span id="addon-castle-calc">+20 € pour 10 joueurs</span></div>
+                </div>
+                <div class="custom-chk"></div>
+              </div>
+
+              <!-- Addon 5: Arcade Tokens -->
+              <div class="addon-row addon-stepper-row" id="addon-arcade-row">
+                <div class="addon-thumb-wrap">
+                  <img src="/images/addon-arcade.avif" alt="Zone Arcade" class="addon-thumb" loading="lazy">
+                  <span class="addon-tag-pill" data-i18n="tagArcade">Salle Arcade</span>
+                </div>
+                <div class="addon-info">
+                  <div class="addon-head-row">
+                    <span class="addon-name" data-i18n="addonArcade">Jetons d'arcade rétro</span>
+                    <span class="addon-price-badge" data-i18n="addonArcadePrice">2 € / jeton</span>
+                  </div>
+                  <span class="addon-sub" data-i18n="addonArcadeSub">Pour les flippers, bornes rétro et simulateurs de pilotage</span>
+                  <div class="addon-calc-tag"><span id="addon-arcade-calc">0 jeton sélectionné (0 €)</span></div>
+                </div>
+                <div class="addon-stepper" onclick="event.stopPropagation();">
+                  <button type="button" class="addon-step-btn" id="btn-dec-arcade" aria-label="Moins de jetons">-</button>
+                  <span class="addon-step-val" id="arcade-qty-val">0</span>
+                  <button type="button" class="addon-step-btn" id="btn-inc-arcade" aria-label="Plus de jetons">+</button>
+                </div>
+              </div>
+
+              <!-- Addon 6: Drinks / Softs -->
+              <div class="addon-row" id="addon-drinks" data-addon="extra_drinks">
+                <div class="addon-thumb-wrap">
+                  <img src="/images/addon-drinks.avif" alt="Boissons & Bar" class="addon-thumb" loading="lazy">
+                  <span class="addon-tag-pill" data-i18n="tagBar">Bar & Lounge</span>
+                </div>
+                <div class="addon-info">
+                  <div class="addon-head-row">
+                    <span class="addon-name" data-i18n="addonDrinks">Boissons supplémentaires / Softs</span>
+                    <span class="addon-price-badge" data-i18n="addonDrinksPrice">+3,20 € / pers.</span>
+                  </div>
+                  <span class="addon-sub" data-i18n="addonDrinksSub">1 boisson fraîche au choix ou pichet rafraîchissant pour le groupe</span>
+                  <div class="addon-calc-tag"><span id="addon-drinks-calc">+32 € pour 10 joueurs</span></div>
+                </div>
+                <div class="custom-chk"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- STEP 4: Review, Details & Payment -->
+      <section class="step-section" id="step-4">
+        <div class="section-head">
+          <h2 data-i18n="step4Title">Coordonnées</h2>
+          <p data-i18n="step4Desc">Validation de la réservation et choix du mode de règlement.</p>
+        </div>
+
+        <div class="checkout-layout">
+          <!-- Organizer Form -->
+          <div class="form-card">
+            <div class="form-group">
+              <label class="form-label" data-i18n="organizerName">Nom et Prénom de l'organisateur</label>
+              <input type="text" id="input-org-name" class="form-input" placeholder="Ex: Jean Dupont" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label" data-i18n="organizerEmail">Adresse e-mail (pour confirmation immédiate)</label>
+              <input type="email" id="input-org-email" class="form-input" placeholder="jean.dupont@email.com" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label" data-i18n="organizerPhone">Numéro de téléphone portable</label>
+              <input type="tel" id="input-org-phone" class="form-input" placeholder="+32 470 12 34 56" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label" data-i18n="specialNotes">Remarques spéciales, allergies alimentaires, régimes</label>
+              <textarea id="input-special-notes" class="form-textarea" rows="3" placeholder="Ex: 1 enfant allergique au gluten, préfère l'équipe rouge..."></textarea>
+            </div>
+
+            <!-- Payment & Deposit Options -->
+            <label class="form-label" style="margin-top: 18px;">Mode de règlement :</label>
+            <div class="payment-toggle" style="display:grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 8px;">
+              <div class="pay-card-opt active" id="pay-opt-bancontact" data-method="bancontact">
+                <div class="pay-card-opt-title">Bancontact</div>
+                <div class="pay-card-opt-desc">App Payconiq / Carte</div>
+              </div>
+              <div class="pay-card-opt" id="pay-opt-payconiq" data-method="payconiq">
+                <div class="pay-card-opt-title">Payconiq</div>
+                <div class="pay-card-opt-desc">Scan QR mobile</div>
+              </div>
+              <div class="pay-card-opt" id="pay-opt-stripe" data-method="stripe">
+                <div class="pay-card-opt-title">Carte Visa/MC</div>
+                <div class="pay-card-opt-desc">Paiement Stripe</div>
+              </div>
+              <div class="pay-card-opt" id="pay-opt-onsite" data-method="onsite">
+                <div class="pay-card-opt-title">Sur place</div>
+                <div class="pay-card-opt-desc">Validation portail</div>
+              </div>
+            </div>
+
+            <!-- Deposit Amount Toggle (30% vs 100%) -->
+            <div id="deposit-amount-selection" style="margin-top:14px;">
+              <label class="form-label">Montant à régler en ligne :</label>
+              <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px;">
+                <div class="pay-card-opt active" id="deposit-mode-30" style="padding:10px 12px;">
+                  <div class="pay-card-opt-title" style="font-size:0.88rem;">Acompte 30%</div>
+                  <div class="pay-card-opt-desc" id="deposit-30-val">Bloque votre créneau</div>
+                </div>
+                <div class="pay-card-opt" id="deposit-mode-100" style="padding:10px 12px;">
+                  <div class="pay-card-opt-title" style="font-size:0.88rem;">Totalité 100%</div>
+                  <div class="pay-card-opt-desc" id="deposit-100-val">Tout réglé à l'avance</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Payment Method Explanations -->
+            <div id="payment-method-details" style="margin-top: 14px; background:var(--bg-surface); padding:14px; border-radius:var(--radius-md); border:1px solid var(--border-medium);">
+              <div id="bancontact-desc" style="display:block; font-size:0.85rem; color:var(--text-secondary);">
+                <div style="font-weight:700; color:var(--laser-cyan); margin-bottom:4px; display:flex; align-items:center; gap:6px;">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><rect width="20" height="14" x="2" y="5" rx="2"/><line x1="2" x2="22" y1="10" y2="10"/></svg>
+                  <span>Paiement Bancontact Belgique</span>
+                </div>
+                <span>Vous serez invité à valider avec votre application bancaire (KBC, Belfius, BNP Paribas Fortis, ING) ou carte Bancontact.</span>
+              </div>
+              <div id="payconiq-desc" style="display:none; font-size:0.85rem; color:var(--text-secondary);">
+                <div style="font-weight:700; color:#ff0055; margin-bottom:4px; display:flex; align-items:center; gap:6px;">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><circle cx="12" cy="12" r="10"/><path d="M16 8h-6a2 2 0 1 0 0 4h4a2 2 0 1 1 0 4H8"/></svg>
+                  <span>Payconiq by Bancontact</span>
+                </div>
+                <span>Un QR Code dynamique s'affichera pour un scan immédiat avec l'application Payconiq.</span>
+              </div>
+              <div id="stripe-card-mock" style="display:none;">
+                <div style="font-size:0.8rem; color:var(--text-secondary); margin-bottom:8px; display:flex; align-items:center; gap:6px;">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><rect width="20" height="14" x="2" y="5" rx="2"/><line x1="2" x2="22" y1="10" y2="10"/></svg>
+                  <span>Paiement CB Sécurisé par Stripe</span>
+                </div>
+                <input type="text" class="form-input" placeholder="4242 •••• •••• 4242" value="•••• •••• •••• 4242" readonly style="letter-spacing:0.08em; background:var(--bg-card); font-variant-numeric:normal; font-family:var(--font-sans);">
+              </div>
+              <div id="onsite-desc" style="display:none; font-size:0.85rem; color:var(--text-secondary);">
+                <div style="font-weight:700; color:var(--laser-amber); margin-bottom:4px;">Règlement le jour J au centre</div>
+                <span>Votre réservation nécessite une validation d'engagement via le portail client envoyé par WhatsApp et e-mail.</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Order Summary Card -->
+          <div class="order-summary-card">
+            <h3 style="font-size:1.2rem; margin-bottom:16px;" data-i18n="orderSummary">Récapitulatif de la réservation</h3>
+            <div id="order-summary-details">
+              <!-- Injected via JavaScript -->
+            </div>
+            <p style="font-size:0.75rem; color:var(--text-muted); margin-top:18px;" data-i18n="termsAgree">
+              J'accepte les conditions de réservation (annulation sans frais jusqu'à 72h avant l'événement).
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <!-- STEP 5: Success Screen -->
+      <section class="step-section" id="step-5">
+        <div class="success-screen">
+          <div class="success-icon-wrap">
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="var(--laser-green)" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+          </div>
+          <h2 data-i18n="bookingSuccessTitle">Réservation confirmée avec succès !</h2>
+          <p style="color:var(--text-secondary); max-width:550px; margin:0 auto;" data-i18n="successMsg">
+            Votre créneau est immédiatement bloqué dans notre planning. Un e-mail de confirmation détaillé vous a été envoyé.
+          </p>
+          <div class="success-ref-badge">
+            <span data-i18n="bookingRef">Numéro de dossier :</span> <strong id="success-booking-ref">#LM-2026</strong>
+          </div>
+
+          <div id="success-booking-details">
+            <!-- Injected via JavaScript -->
+          </div>
+
+          <div class="success-actions" style="display:flex; flex-direction:column; gap:10px; max-width:480px; margin:24px auto 0;">
+            <a href="#" target="_blank" class="btn btn-secondary" id="btn-whatsapp-recap" style="color:#25D366; border-color:rgba(37,211,102,0.4); justify-content:center; padding:12px 18px; font-weight:700;">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+              <span data-i18n="btnWhatsAppRecap">Ouvrir mon récapitulatif WhatsApp</span>
+            </a>
+            <a href="#" target="_blank" class="btn btn-primary" id="btn-client-portal" style="justify-content:center; padding:12px 18px; font-weight:700;">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+              <span data-i18n="btnClientPortal">Accéder à mon espace de confirmation client</span>
+            </a>
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px;">
+              <button type="button" class="btn btn-secondary" id="btn-preview-email" style="justify-content:center; font-size:0.85rem;">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
+                <span data-i18n="btnPreviewEmail">Aperçu e-mail</span>
+              </button>
+              <button type="button" class="btn btn-secondary" id="btn-add-calendar" style="justify-content:center; font-size:0.85rem;">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                <span data-i18n="btnAddToCalendar">Agenda (.ics)</span>
+              </button>
+            </div>
+            <button type="button" class="btn btn-secondary" id="btn-restart-booking" style="justify-content:center; font-size:0.82rem; opacity:0.8; margin-top:8px;">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
+              <span data-i18n="btnNewBooking">Effectuer une autre réservation</span>
+            </button>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <!-- Wizard Footer Navigation -->
+    <footer class="wizard-footer" id="widget-footer" style="display: none;">
+      <button type="button" class="btn btn-secondary" id="btn-prev-step">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
+        <span data-i18n="cancel">Retour</span>
+      </button>
+      <button type="button" class="btn btn-primary btn-lg" id="btn-next-step">
+        <span>Suivant</span>
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+      </button>
+    </footer>
+  </div>
+
+  <!-- MODAL: Client Email Preview -->
+  <div class="modal-overlay" id="widget-email-modal" style="display:none; position:fixed; inset:0; background:rgba(4,7,15,0.85); backdrop-filter:blur(8px); z-index:9999; align-items:center; justify-content:center;">
+    <div style="background:var(--bg-surface); border:1px solid var(--border-medium); border-radius:var(--radius-lg); width:95%; max-width:640px; max-height:85vh; display:flex; flex-direction:column; overflow:hidden; box-shadow: 0 20px 50px rgba(0,0,0,0.7);">
+      <div style="display:flex; justify-content:space-between; align-items:center; padding:16px 20px; border-bottom:1px solid var(--border-subtle);">
+        <h3 style="margin:0; font-size:1.1rem; color:#fff;" data-i18n="btnPreviewEmail">Aperçu de votre e-mail de confirmation</h3>
+        <button type="button" class="btn btn-secondary btn-sm" id="btn-close-widget-email" style="padding:6px 10px; cursor:pointer;" aria-label="Fermer">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+        </button>
+      </div>
+      <div style="padding:16px; flex:1; overflow-y:auto;" id="widget-email-content">
+        <iframe id="widget-email-iframe" style="width:100%; height:450px; border:none; border-radius:var(--radius-sm); background:#fff;"></iframe>
+      </div>
+    </div>
+  </div>
+
+  <script type="module">
+    import { initWidget } from './src/widget.js';
+    initWidget();
+  </script>
+</body>
+</html>

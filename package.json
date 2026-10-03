@@ -1,0 +1,18 @@
+{
+  "name": "laser-magic-booking-system",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Next-Gen Reservation Widget & Back-Office for Laser Magic (Vilvoorde / Brussels)",
+  "type": "module",
+  "scripts": {
+    "dev": "vite --port 3300 --host",
+    "build": "vite build",
+    "preview": "vite preview --port 3300"
+  },
+  "devDependencies": {
+    "vite": "^6.0.0"
+  },
+  "dependencies": {
+    "qrcode": "^1.5.4"
+  }
+}

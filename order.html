@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Laser Magic - Commande à Table</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="./src/styles/theme.css">
+  <link rel="stylesheet" href="./src/styles/clientOrder.css">
+</head>
+<body>
+
+  <!-- Top Sticky Header -->
+  <header class="order-header">
+    <div class="order-brand">
+      <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="var(--laser-cyan)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="order-logo">
+        <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
+      </svg>
+      <div class="order-brand-text">
+        <h1>Laser Magic</h1>
+        <span id="order-brand-sub">Commande Mobile à Table</span>
+      </div>
+    </div>
+
+    <div class="order-top-controls">
+      <div class="order-lang-switch">
+        <button type="button" class="order-lang-btn active" data-lang="fr">FR</button>
+        <button type="button" class="order-lang-btn" data-lang="nl">NL</button>
+        <button type="button" class="order-lang-btn" data-lang="en">EN</button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Table & Booking Identification Banner -->
+  <section class="order-table-banner" id="order-table-banner">
+    <div class="order-table-info">
+      <div class="order-table-badge">
+        <span class="order-table-badge-lbl" id="order-table-badge-lbl">Table</span>
+        <span class="order-table-badge-num" id="order-table-badge-num">3</span>
+      </div>
+      <div class="order-table-texts">
+        <div class="order-booking-name" id="order-booking-name">Chargement...</div>
+        <div class="order-booking-sub" id="order-booking-sub">
+          <span>Recherche de la réservation...</span>
+        </div>
+      </div>
+    </div>
+    <div class="order-table-balance">
+      <div class="order-table-balance-lbl" id="order-table-balance-lbl">Ardoise actuelle</div>
+      <div class="order-table-balance-val" id="order-table-balance-val">0,00 €</div>
+    </div>
+  </section>
+
+  <!-- Category Nav Sticky Bar -->
+  <div class="order-cat-nav-wrapper">
+    <nav class="order-cat-nav" id="order-cat-nav">
+      <!-- Injected by clientOrder.js -->
+    </nav>
+  </div>
+
+  <!-- Search Bar -->
+  <div class="order-search-wrap">
+    <div style="position:relative;">
+      <svg class="order-search-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+      </svg>
+      <input type="text" id="order-search-input" class="order-search-input" placeholder="Rechercher une boisson, pizza, snack...">
+    </div>
+  </div>
+
+  <!-- Product Catalog Grid -->
+  <main class="order-catalog-wrap">
+    <div class="order-grid" id="order-products-grid">
+      <!-- Injected dynamically by clientOrder.js -->
+    </div>
+  </main>
+
+  <!-- Sticky Bottom Cart Action Bar -->
+  <div class="order-cart-bar" id="order-cart-bar">
+    <div class="order-cart-summary">
+      <span class="order-cart-items-count" id="order-cart-items-count">0 article(s)</span>
+      <span class="order-cart-total-price" id="order-cart-total-price">0,00 €</span>
+    </div>
+    <button type="button" class="order-cart-checkout-btn" id="order-cart-checkout-btn">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/>
+      </svg>
+      <span id="order-cart-btn-text">Voir la commande</span>
+    </button>
+  </div>
+
+  <!-- Order Drawer / Modal -->
+  <div class="order-modal-overlay" id="order-cart-modal">
+    <div class="order-modal-sheet">
+      <div class="order-sheet-header">
+        <h2 class="order-sheet-title" id="order-sheet-title">Votre Commande à Table</h2>
+        <button type="button" class="order-sheet-close" id="order-sheet-close" aria-label="Fermer">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+          </svg>
+        </button>
+      </div>
+
+      <div class="order-sheet-body">
+        <div id="order-sheet-items-list">
+          <!-- Injected items -->
+        </div>
+
+        <textarea id="order-sheet-notes" class="order-sheet-notes-input" rows="2" placeholder="Instructions bar / cuisine (ex: sans glaçons, sauce à part...)"></textarea>
+
+        <!-- Payment Mode Selector -->
+        <div class="order-payment-selector">
+          <label class="order-payment-opt active" for="order-mode-tab">
+            <input type="radio" name="order_pay_mode" id="order-mode-tab" class="order-payment-radio" value="tab" checked>
+            <div>
+              <div class="order-payment-opt-title" id="order-pay-tab-lbl">Ajouter sur la note de la Table (Ardoise)</div>
+              <div class="order-payment-opt-sub" id="order-pay-tab-sub">À régler à la caisse d'accueil à la fin de votre session</div>
+              
+              <!-- Security PIN wrap -->
+              <div class="order-pin-wrap" id="order-pin-wrapper" style="display:none;">
+                <div style="font-size:0.75rem; color:var(--laser-cyan); font-weight:700; margin-bottom:4px;" id="order-pin-label">
+                  Sécurité : 4 derniers chiffres du tél. organisateur
+                </div>
+                <input type="tel" id="order-pin-input" class="order-pin-input" maxlength="4" placeholder="••••" autocomplete="off">
+                <div id="order-pin-error" style="color:var(--laser-red); font-size:0.72rem; margin-top:4px; display:none;"></div>
+              </div>
+            </div>
+          </label>
+
+          <label class="order-payment-opt" for="order-mode-direct">
+            <input type="radio" name="order_pay_mode" id="order-mode-direct" class="order-payment-radio" value="direct">
+            <div>
+              <div class="order-payment-opt-title" id="order-pay-dir-lbl">Payer immédiatement par Bancontact / Payconiq</div>
+              <div class="order-payment-opt-sub" id="order-pay-dir-sub">Règlement instantané sécurisé par mobile</div>
+            </div>
+          </label>
+        </div>
+      </div>
+
+      <div class="order-sheet-footer">
+        <button type="button" class="order-submit-btn" id="order-submit-btn">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/>
+          </svg>
+          <span id="order-submit-btn-text">Confirmer & Envoyer en Préparation</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Live Order Tracker Modal -->
+  <div class="order-modal-overlay" id="order-tracker-modal">
+    <div class="order-tracker-card">
+      <div style="width:52px; height:52px; background:rgba(0,255,136,0.15); border:2px solid var(--order-green); border-radius:50%; display:flex; align-items:center; justify-content:center; margin:0 auto 14px auto;">
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="var(--order-green)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="20 6 9 17 4 12"/>
+        </svg>
+      </div>
+
+      <h2 style="font-size:1.25rem; font-weight:800; color:#fff; margin-bottom:6px;">Commande Transmise !</h2>
+      <p style="font-size:0.82rem; color:rgba(255,255,255,0.65);">
+        Table <strong style="color:var(--order-accent);" id="tracker-table-num">3</strong> · Réf : <span id="tracker-order-id" style="font-family:monospace; color:var(--order-amber);">ORD-001</span>
+      </p>
+
+      <div style="background:rgba(255,255,255,0.04); border-radius:12px; padding:10px 14px; margin:16px 0; font-size:0.82rem; color:#fff; text-align:left;" id="tracker-items-summary">
+        2x Coca-Cola, 1x Pizza Margherita
+      </div>
+
+      <!-- 3-Step Live Tracker -->
+      <div class="order-tracker-stepper">
+        <div class="order-tracker-step done" id="tracker-step-1">
+          <div class="order-tracker-circle">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+          </div>
+          <div>
+            <div class="order-tracker-step-title">1. Commande reçue</div>
+            <div class="order-tracker-step-sub">Transmise au bar et en cuisine</div>
+          </div>
+        </div>
+
+        <div class="order-tracker-step active" id="tracker-step-2">
+          <div class="order-tracker-circle">2</div>
+          <div>
+            <div class="order-tracker-step-title">2. En préparation</div>
+            <div class="order-tracker-step-sub">Notre équipe prépare vos consommations</div>
+          </div>
+        </div>
+
+        <div class="order-tracker-step" id="tracker-step-3">
+          <div class="order-tracker-circle">3</div>
+          <div>
+            <div class="order-tracker-step-title">3. Prête à servir</div>
+            <div class="order-tracker-step-sub">Servie directement à votre table</div>
+          </div>
+        </div>
+      </div>
+
+      <button type="button" class="order-cart-checkout-btn" id="btn-order-more" style="width:100%; justify-content:center; margin-top:10px;">
+        Commander d'autres articles
+      </button>
+    </div>
+  </div>
+
+  <script type="module" src="./src/clientOrder.js"></script>
+</body>
+</html>
