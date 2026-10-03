@@ -1,5 +1,13 @@
 // Shared State & Persistence for Laser Magic (Vilvoorde / Brussels)
 // Handles live capacity, reservation status transitions, and cross-tab sync
+import {
+  supabase,
+  isSupabaseConfigured,
+  bookingToSupabaseRow,
+  supabaseRowToBooking,
+  clientToSupabaseRow,
+  supabaseRowToClient
+} from './supabaseClient.js';
 
 const STORAGE_KEY = 'laser_magic_reservations_v2';
 const CUSTOM_CLIENTS_KEY = 'laser_magic_custom_clients';
@@ -352,7 +360,147 @@ class Store {
     this.bookings = [];
     this.customClients = [];
     this.listeners = [];
+    this.cloudSyncStatus = isSupabaseConfigured ? 'connecting' : 'local_only';
+    this.supabaseChannel = null;
     this.init();
+    if (isSupabaseConfigured) {
+      this.initSupabaseSync();
+    }
+  }
+
+  isCloudConnected() {
+    return isSupabaseConfigured && Boolean(supabase);
+  }
+
+  async initSupabaseSync() {
+    if (!isSupabaseConfigured || !supabase) return;
+
+    try {
+      const { data: cloudBookings, error: bError } = await supabase
+        .from('bookings')
+        .select('*')
+        .order('date', { ascending: false });
+
+      if (bError) {
+        console.warn('[Supabase] Erreur chargement réservations:', bError);
+        this.cloudSyncStatus = 'error';
+      } else if (Array.isArray(cloudBookings)) {
+        if (cloudBookings.length > 0) {
+          this.bookings = cloudBookings.map(supabaseRowToBooking);
+          this.persist(false);
+          this.notify(false);
+        } else if (this.bookings.length > 0) {
+          // Baza cloud este proaspăt creată -> sincronizăm automat rezervările existente
+          console.log('[Supabase] Initialisation de la base distante avec les données de démarrage...');
+          await this.syncAllToSupabase();
+        }
+      }
+
+      const { data: cloudClients, error: cError } = await supabase
+        .from('clients')
+        .select('*');
+
+      if (!cError && Array.isArray(cloudClients) && cloudClients.length > 0) {
+        this.customClients = cloudClients.map(supabaseRowToClient);
+        this.persistCustomClients(false);
+        this.notify(false);
+      }
+
+      if (this.supabaseChannel) {
+        supabase.removeChannel(this.supabaseChannel);
+      }
+
+      this.supabaseChannel = supabase
+        .channel('laser_magic_realtime_sync')
+        .on('postgres_changes', { event: '*', schema: 'public', table: 'bookings' }, (payload) => {
+          this.handleCloudBookingChange(payload);
+        })
+        .on('postgres_changes', { event: '*', schema: 'public', table: 'clients' }, (payload) => {
+          this.handleCloudClientChange(payload);
+        })
+        .subscribe((status) => {
+          this.cloudSyncStatus = status === 'SUBSCRIBED' ? 'connected' : status;
+          this.notify(false);
+        });
+
+    } catch (err) {
+      console.warn('[Supabase Sync Init Exception]:', err);
+      this.cloudSyncStatus = 'error';
+    }
+  }
+
+  handleCloudBookingChange(payload) {
+    if (!payload) return;
+    const { eventType, new: newRow, old: oldRow } = payload;
+
+    if (eventType === 'INSERT' || eventType === 'UPDATE') {
+      const incoming = supabaseRowToBooking(newRow);
+      if (!incoming || !incoming.id) return;
+
+      const idx = this.bookings.findIndex(b => b.id === incoming.id);
+      if (idx >= 0) {
+        this.bookings[idx] = incoming;
+      } else {
+        this.bookings.unshift(incoming);
+      }
+      this.persist(false);
+      this.notify(false);
+    } else if (eventType === 'DELETE' && oldRow && oldRow.id) {
+      this.bookings = this.bookings.filter(b => b.id !== oldRow.id);
+      this.persist(false);
+      this.notify(false);
+    }
+  }
+
+  handleCloudClientChange(payload) {
+    if (!payload) return;
+    const { eventType, new: newRow, old: oldRow } = payload;
+
+    if (eventType === 'INSERT' || eventType === 'UPDATE') {
+      const incoming = supabaseRowToClient(newRow);
+      if (!incoming || !incoming.id) return;
+
+      const idx = this.customClients.findIndex(c => c.id === incoming.id);
+      if (idx >= 0) {
+        this.customClients[idx] = incoming;
+      } else {
+        this.customClients.push(incoming);
+      }
+      this.persistCustomClients(false);
+      this.notify(false);
+    } else if (eventType === 'DELETE' && oldRow && oldRow.id) {
+      this.customClients = this.customClients.filter(c => c.id !== oldRow.id);
+      this.persistCustomClients(false);
+      this.notify(false);
+    }
+  }
+
+  async syncAllToSupabase() {
+    if (!isSupabaseConfigured || !supabase) {
+      return { success: false, reason: 'not_configured' };
+    }
+    try {
+      if (this.bookings && this.bookings.length > 0) {
+        const bookingRows = this.bookings.map(bookingToSupabaseRow);
+        const { error: bErr } = await supabase.from('bookings').upsert(bookingRows);
+        if (bErr) throw bErr;
+      }
+
+      if (this.customClients && this.customClients.length > 0) {
+        const clientRows = this.customClients.map(clientToSupabaseRow);
+        const { error: cErr } = await supabase.from('clients').upsert(clientRows);
+        if (cErr) throw cErr;
+      }
+
+      return {
+        success: true,
+        bookingsCount: this.bookings.length,
+        clientsCount: this.customClients.length
+      };
+    } catch (err) {
+      console.error('[Supabase Sync All Error]:', err);
+      return { success: false, error: err.message };
+    }
   }
 
   init() {
@@ -674,6 +822,10 @@ class Store {
 
     this.persistCustomClients();
     this.notify();
+    if (isSupabaseConfigured && supabase && Array.isArray(this.customClients)) {
+      const rows = this.customClients.map(clientToSupabaseRow);
+      supabase.from('clients').upsert(rows).catch(e => console.warn('[Supabase Clients Upsert Error]:', e));
+    }
     return { added: addedCount, updated: updatedCount, total: clientsList.length };
   }
 
@@ -735,6 +887,9 @@ class Store {
 
     this.bookings.unshift(newBooking);
     this.notify(true);
+    if (isSupabaseConfigured && supabase) {
+      supabase.from('bookings').upsert(bookingToSupabaseRow(newBooking)).catch(e => console.warn('[Supabase Insert Error]:', e));
+    }
     this.dispatchWebhook('booking.created', newBooking);
     return newBooking;
   }
@@ -986,6 +1141,9 @@ class Store {
     this.bookings.unshift(newBooking);
     this.persist(true);
     this.notify(true);
+    if (isSupabaseConfigured && supabase) {
+      supabase.from('bookings').upsert(bookingToSupabaseRow(newBooking)).catch(e => console.warn('[Supabase Insert Error]:', e));
+    }
     return newBooking;
   }
 
@@ -1059,8 +1217,12 @@ class Store {
     const idx = this.bookings.findIndex(b => b.id === id);
     if (idx !== -1) {
       this.bookings[idx] = { ...this.bookings[idx], ...partial };
+      const updated = this.bookings[idx];
       this.notify(true);
-      return this.bookings[idx];
+      if (isSupabaseConfigured && supabase) {
+        supabase.from('bookings').upsert(bookingToSupabaseRow(updated)).catch(e => console.warn('[Supabase Update Error]:', e));
+      }
+      return updated;
     }
     return null;
   }
@@ -1077,6 +1239,9 @@ class Store {
     const b = this.getById(id);
     this.bookings = this.bookings.filter(b => b.id !== id);
     this.notify(true);
+    if (isSupabaseConfigured && supabase) {
+      supabase.from('bookings').delete().eq('id', id).catch(e => console.warn('[Supabase Delete Error]:', e));
+    }
     if (b) {
       this.dispatchWebhook('booking.cancelled', b);
     }

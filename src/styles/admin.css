@@ -2800,3 +2800,73 @@ body.admin-body {
   background: #059669;
 }
 
+/* Cloud Sync Indicator Badge in Topbar */
+.cloud-sync-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 5px 12px;
+  border-radius: var(--radius-full);
+  font-size: 0.76rem;
+  font-weight: 700;
+  border: 1px solid var(--border-subtle);
+  background: var(--bg-card);
+  color: var(--text-secondary);
+  transition: all var(--transition-fast);
+  cursor: default;
+}
+
+.cloud-sync-badge .sync-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  display: inline-block;
+  background: #94a3b8;
+}
+
+.cloud-sync-badge.status-connected {
+  border-color: rgba(0, 255, 136, 0.35);
+  background: rgba(0, 255, 136, 0.08);
+  color: var(--laser-green);
+}
+
+.cloud-sync-badge.status-connected .sync-dot {
+  background: var(--laser-green);
+  box-shadow: 0 0 8px rgba(0, 255, 136, 0.7);
+  animation: pulse-sync 2s infinite ease-in-out;
+}
+
+.cloud-sync-badge.status-connecting {
+  border-color: rgba(0, 240, 255, 0.35);
+  background: rgba(0, 240, 255, 0.08);
+  color: var(--laser-cyan);
+}
+
+.cloud-sync-badge.status-connecting .sync-dot {
+  background: var(--laser-cyan);
+  animation: pulse-sync 1s infinite ease-in-out;
+}
+
+.cloud-sync-badge.status-warning {
+  border-color: rgba(255, 184, 0, 0.35);
+  background: rgba(255, 184, 0, 0.08);
+  color: #fbbf24;
+}
+
+.cloud-sync-badge.status-warning .sync-dot {
+  background: #fbbf24;
+}
+
+.cloud-sync-badge.status-local {
+  border-color: rgba(148, 163, 184, 0.25);
+  background: rgba(148, 163, 184, 0.06);
+  color: var(--text-muted);
+}
+
+@keyframes pulse-sync {
+  0% { transform: scale(0.9); opacity: 0.6; }
+  50% { transform: scale(1.2); opacity: 1; }
+  100% { transform: scale(0.9); opacity: 0.6; }
+}
+
+

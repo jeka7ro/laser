@@ -226,8 +226,37 @@ function setupBrusselsClock() {
   setInterval(update, 1000);
 }
 
+function updateCloudSyncIndicator() {
+  const el = document.getElementById('cloud-sync-indicator');
+  const textEl = document.getElementById('cloud-sync-text');
+  if (!el || !textEl) return;
+
+  if (store.isCloudConnected()) {
+    const status = store.cloudSyncStatus;
+    if (status === 'connected') {
+      el.className = 'cloud-sync-badge status-connected';
+      textEl.textContent = 'Supabase Live';
+      el.title = 'Bază de date Supabase sincronizată în timp real';
+    } else if (status === 'error') {
+      el.className = 'cloud-sync-badge status-warning';
+      textEl.textContent = 'Supabase Sync Warning';
+      el.title = 'A apărut o problemă la sincronizarea Supabase';
+    } else {
+      el.className = 'cloud-sync-badge status-connecting';
+      textEl.textContent = 'Supabase Connecting...';
+      el.title = 'Conectare la Supabase...';
+    }
+  } else {
+    el.className = 'cloud-sync-badge status-local';
+    textEl.textContent = 'Mode Local (Demo)';
+    el.title = 'Date stocate local în browser. Adăugați VITE_SUPABASE_URL în .env sau Netlify pentru sincronizare cloud.';
+  }
+}
+
 function setupStoreSubscription() {
+  updateCloudSyncIndicator();
   store.subscribe(() => {
+    updateCloudSyncIndicator();
     renderKPIs();
     if (activeTab === 'timeline') renderTimeline();
     if (activeTab === 'bookings') renderBookingsTable();
@@ -236,6 +265,7 @@ function setupStoreSubscription() {
     if (activeTab === 'kitchen') renderKitchenView();
   });
 }
+
 
 function renderAllViews() {
   // Update localized text for elements with data-i18n

@@ -1,0 +1,95 @@
+[build]
+  command = "npm run build"
+  publish = "dist"
+
+[build.environment]
+  NODE_VERSION = "20"
+
+# Redirectionari URL curate pentru pagini
+[[redirects]]
+  from = "/widget"
+  to = "/widget.html"
+  status = 200
+
+[[redirects]]
+  from = "/widget/"
+  to = "/widget.html"
+  status = 200
+
+[[redirects]]
+  from = "/confirm"
+  to = "/confirm.html"
+  status = 200
+
+[[redirects]]
+  from = "/confirm/"
+  to = "/confirm.html"
+  status = 200
+
+[[redirects]]
+  from = "/order"
+  to = "/order.html"
+  status = 200
+
+[[redirects]]
+  from = "/order/"
+  to = "/order.html"
+  status = 200
+
+[[redirects]]
+  from = "/embed"
+  to = "/embed-preview.html"
+  status = 200
+
+[[redirects]]
+  from = "/embed/"
+  to = "/embed-preview.html"
+  status = 200
+
+# Antete pentru integrare Iframe pe WordPress si alte domenii externe
+[[headers]]
+  for = "/widget.html"
+  [headers.values]
+    X-Frame-Options = "ALLOWALL"
+    Content-Security-Policy = "frame-ancestors *"
+    Access-Control-Allow-Origin = "*"
+
+[[headers]]
+  for = "/widget"
+  [headers.values]
+    X-Frame-Options = "ALLOWALL"
+    Content-Security-Policy = "frame-ancestors *"
+    Access-Control-Allow-Origin = "*"
+
+[[headers]]
+  for = "/embed-preview.html"
+  [headers.values]
+    X-Frame-Options = "ALLOWALL"
+    Content-Security-Policy = "frame-ancestors *"
+    Access-Control-Allow-Origin = "*"
+
+[[headers]]
+  for = "/embed"
+  [headers.values]
+    X-Frame-Options = "ALLOWALL"
+    Content-Security-Policy = "frame-ancestors *"
+    Access-Control-Allow-Origin = "*"
+
+[[headers]]
+  for = "/order.html"
+  [headers.values]
+    X-Frame-Options = "ALLOWALL"
+    Content-Security-Policy = "frame-ancestors *"
+    Access-Control-Allow-Origin = "*"
+
+# Caching performant pentru resurse statice versionate
+[[headers]]
+  for = "/assets/*"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+# Revalidare rapida a paginilor HTML la fiecare deploy
+[[headers]]
+  for = "/*.html"
+  [headers.values]
+    Cache-Control = "public, max-age=0, must-revalidate"
