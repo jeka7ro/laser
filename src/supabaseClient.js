@@ -12,6 +12,10 @@ export const isSupabaseConfigured = Boolean(
   supabaseAnonKey.length > 20
 );
 
+export const TABLE_BOOKINGS = 'laser_bookings';
+export const TABLE_CLIENTS = 'laser_clients';
+export const TABLE_SETTINGS = 'laser_app_settings';
+
 export const supabase = isSupabaseConfigured
   ? createClient(supabaseUrl, supabaseAnonKey, {
       auth: {

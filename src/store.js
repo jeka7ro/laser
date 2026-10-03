@@ -3,6 +3,8 @@
 import {
   supabase,
   isSupabaseConfigured,
+  TABLE_BOOKINGS,
+  TABLE_CLIENTS,
   bookingToSupabaseRow,
   supabaseRowToBooking,
   clientToSupabaseRow,
@@ -377,7 +379,7 @@ class Store {
 
     try {
       const { data: cloudBookings, error: bError } = await supabase
-        .from('bookings')
+        .from(TABLE_BOOKINGS)
         .select('*')
         .order('date', { ascending: false });
 
@@ -397,7 +399,7 @@ class Store {
       }
 
       const { data: cloudClients, error: cError } = await supabase
-        .from('clients')
+        .from(TABLE_CLIENTS)
         .select('*');
 
       if (!cError && Array.isArray(cloudClients) && cloudClients.length > 0) {
@@ -412,10 +414,10 @@ class Store {
 
       this.supabaseChannel = supabase
         .channel('laser_magic_realtime_sync')
-        .on('postgres_changes', { event: '*', schema: 'public', table: 'bookings' }, (payload) => {
+        .on('postgres_changes', { event: '*', schema: 'public', table: TABLE_BOOKINGS }, (payload) => {
           this.handleCloudBookingChange(payload);
         })
-        .on('postgres_changes', { event: '*', schema: 'public', table: 'clients' }, (payload) => {
+        .on('postgres_changes', { event: '*', schema: 'public', table: TABLE_CLIENTS }, (payload) => {
           this.handleCloudClientChange(payload);
         })
         .subscribe((status) => {
@@ -482,13 +484,13 @@ class Store {
     try {
       if (this.bookings && this.bookings.length > 0) {
         const bookingRows = this.bookings.map(bookingToSupabaseRow);
-        const { error: bErr } = await supabase.from('bookings').upsert(bookingRows);
+        const { error: bErr } = await supabase.from(TABLE_BOOKINGS).upsert(bookingRows);
         if (bErr) throw bErr;
       }
 
       if (this.customClients && this.customClients.length > 0) {
         const clientRows = this.customClients.map(clientToSupabaseRow);
-        const { error: cErr } = await supabase.from('clients').upsert(clientRows);
+        const { error: cErr } = await supabase.from(TABLE_CLIENTS).upsert(clientRows);
         if (cErr) throw cErr;
       }
 
@@ -824,7 +826,7 @@ class Store {
     this.notify();
     if (isSupabaseConfigured && supabase && Array.isArray(this.customClients)) {
       const rows = this.customClients.map(clientToSupabaseRow);
-      supabase.from('clients').upsert(rows).catch(e => console.warn('[Supabase Clients Upsert Error]:', e));
+      supabase.from(TABLE_CLIENTS).upsert(rows).catch(e => console.warn('[Supabase Clients Upsert Error]:', e));
     }
     return { added: addedCount, updated: updatedCount, total: clientsList.length };
   }
@@ -888,7 +890,7 @@ class Store {
     this.bookings.unshift(newBooking);
     this.notify(true);
     if (isSupabaseConfigured && supabase) {
-      supabase.from('bookings').upsert(bookingToSupabaseRow(newBooking)).catch(e => console.warn('[Supabase Insert Error]:', e));
+      supabase.from(TABLE_BOOKINGS).upsert(bookingToSupabaseRow(newBooking)).catch(e => console.warn('[Supabase Insert Error]:', e));
     }
     this.dispatchWebhook('booking.created', newBooking);
     return newBooking;
@@ -1142,7 +1144,7 @@ class Store {
     this.persist(true);
     this.notify(true);
     if (isSupabaseConfigured && supabase) {
-      supabase.from('bookings').upsert(bookingToSupabaseRow(newBooking)).catch(e => console.warn('[Supabase Insert Error]:', e));
+      supabase.from(TABLE_BOOKINGS).upsert(bookingToSupabaseRow(newBooking)).catch(e => console.warn('[Supabase Insert Error]:', e));
     }
     return newBooking;
   }
@@ -1220,7 +1222,7 @@ class Store {
       const updated = this.bookings[idx];
       this.notify(true);
       if (isSupabaseConfigured && supabase) {
-        supabase.from('bookings').upsert(bookingToSupabaseRow(updated)).catch(e => console.warn('[Supabase Update Error]:', e));
+        supabase.from(TABLE_BOOKINGS).upsert(bookingToSupabaseRow(updated)).catch(e => console.warn('[Supabase Update Error]:', e));
       }
       return updated;
     }
@@ -1240,7 +1242,7 @@ class Store {
     this.bookings = this.bookings.filter(b => b.id !== id);
     this.notify(true);
     if (isSupabaseConfigured && supabase) {
-      supabase.from('bookings').delete().eq('id', id).catch(e => console.warn('[Supabase Delete Error]:', e));
+      supabase.from(TABLE_BOOKINGS).delete().eq('id', id).catch(e => console.warn('[Supabase Delete Error]:', e));
     }
     if (b) {
       this.dispatchWebhook('booking.cancelled', b);
