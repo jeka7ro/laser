@@ -1868,25 +1868,34 @@ body.admin-body {
   flex-shrink: 0;
 }
 
-/* Floating Donut Tooltip (Matching Screenshot 4) */
+/* Floating Donut Tooltip (Hidden by default, shown on hover/focus) */
 .donut-tooltip {
   position: absolute;
-  top: 65px;
-  left: 24px;
-  background: #1e293b;
+  top: 55px;
+  left: 20px;
+  background: #0f172a;
   color: #ffffff;
   padding: 8px 16px;
   border-radius: 12px;
   font-weight: 700;
   font-size: 0.88rem;
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.45);
-  border: 1px solid rgba(255, 255, 255, 0.12);
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.15);
   display: flex;
   align-items: center;
   gap: 8px;
   pointer-events: none;
-  animation: fadeIn 0.3s ease;
-  z-index: 5;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.2s ease, transform 0.2s ease;
+  transform: translateY(-4px);
+  z-index: 10;
+}
+
+.donut-tooltip.visible {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
 }
 
 .donut-tooltip::after {
@@ -1896,11 +1905,104 @@ body.admin-body {
   left: 36px;
   width: 12px;
   height: 12px;
-  background: #1e293b;
+  background: #0f172a;
   transform: rotate(45deg);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.12);
-  border-right: 1px solid rgba(255, 255, 255, 0.12);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+  border-right: 1px solid rgba(255, 255, 255, 0.15);
 }
+
+/* Donut Interactive Arcs & Hover Effects */
+.donut-arc {
+  cursor: pointer;
+  transition: stroke-width 0.2s ease, filter 0.2s ease, opacity 0.2s ease;
+}
+
+.donut-arc:hover {
+  stroke-width: 32;
+  filter: drop-shadow(0 0 10px rgba(0, 240, 255, 0.6));
+}
+
+.donut-arc.active-arc {
+  stroke-width: 32;
+  filter: drop-shadow(0 0 12px rgba(255, 255, 255, 0.8));
+}
+
+.donut-center-btn {
+  cursor: pointer;
+  transition: transform 0.2s ease;
+}
+
+.donut-center-btn:hover circle {
+  fill: #334155 !important;
+}
+
+.donut-legend-pill {
+  cursor: pointer;
+  transition: all 0.2s ease;
+  user-select: none;
+}
+
+.donut-legend-pill:hover {
+  border-color: rgba(255, 255, 255, 0.3);
+  transform: translateY(-1px);
+}
+
+.donut-legend-pill.active {
+  border-color: var(--laser-cyan) !important;
+  background: rgba(0, 240, 255, 0.15) !important;
+  box-shadow: 0 0 12px rgba(0, 240, 255, 0.3);
+}
+
+/* Clickable Interactive Cards in Reports */
+.report-interactive-item {
+  cursor: pointer;
+  transition: all 0.2s ease;
+  padding: 8px;
+  border-radius: 12px;
+}
+
+.report-interactive-item:hover {
+  background: rgba(255, 255, 255, 0.04);
+  transform: translateX(4px);
+}
+
+.report-interactive-item.active {
+  background: rgba(0, 240, 255, 0.08);
+  border: 1px solid rgba(0, 240, 255, 0.4);
+}
+
+/* Active filter chips banner */
+.active-filters-bar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  padding: 8px 16px;
+  background: rgba(0, 240, 255, 0.06);
+  border: 1px dashed rgba(0, 240, 255, 0.3);
+  border-radius: 14px;
+  margin-bottom: 16px;
+  font-size: 0.84rem;
+}
+
+.active-filter-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 12px;
+  background: rgba(0, 240, 255, 0.15);
+  color: var(--laser-cyan);
+  border-radius: var(--radius-full);
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.active-filter-tag:hover {
+  background: rgba(255, 27, 123, 0.2);
+  color: var(--laser-pink);
+}
+
 
 /* Table Row Clickable Hover (Click anywhere on order to view modal) */
 .booking-table-row {

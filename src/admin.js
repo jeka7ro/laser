@@ -1935,8 +1935,10 @@ window.newBookingForClient = (clientId) => {
   showAdminToast(`Formulaire pré-rempli pour ${client.customerName} !`);
 };
 
-// 3. REPORTS & ANALYTICS DASHBOARD VIEW (Inspired by User Screenshots 3 & 4)
-let currentReportsPeriod = 'all';
+// 3. REPORTS & ANALYTICS DASHBOARD VIEW (Multi-filter Reactive Cross-filtering)
+let currentReportsPeriod = 'all'; // 'all' | 'today' | 'weekend' | 'month'
+let currentReportsStatus = 'all'; // 'all' | 'confirmed' | 'pending'
+let currentReportsPackage = 'all'; // 'all' | 'fun' | 'vip' | 'sweet' | 'standard'
 
 function setupReportsPeriodFilter() {
   const periodPills = document.querySelectorAll('#reports-period-pills .pill-filter-btn');
@@ -1953,7 +1955,7 @@ function setupReportsPeriodFilter() {
   const exportBtn = document.getElementById('btn-export-reports');
   if (exportBtn) {
     exportBtn.onclick = () => {
-      showAdminToast("Génération du rapport récapitulatif PDF & Excel...", "success");
+      showAdminToast("Generation du rapport recapitulatif PDF & Excel...", "success");
       setTimeout(() => {
         window.print();
       }, 500);
@@ -1961,7 +1963,7 @@ function setupReportsPeriodFilter() {
   }
 }
 
-function getFilteredReportsBookings() {
+function getPeriodBookings() {
   const all = store.getAll();
   const todayStr = new Date().toISOString().split('T')[0];
 
@@ -1982,6 +1984,28 @@ function getFilteredReportsBookings() {
   return all;
 }
 
+function getFilteredReportsBookings() {
+  let list = getPeriodBookings();
+
+  if (currentReportsStatus === 'confirmed') {
+    list = list.filter(b => b.status === 'confirmed');
+  } else if (currentReportsStatus === 'pending') {
+    list = list.filter(b => b.status !== 'confirmed');
+  }
+
+  if (currentReportsPackage === 'fun') {
+    list = list.filter(b => b.packageId === 'fun');
+  } else if (currentReportsPackage === 'vip') {
+    list = list.filter(b => b.packageId === 'vip');
+  } else if (currentReportsPackage === 'sweet') {
+    list = list.filter(b => b.packageId === 'sweet');
+  } else if (currentReportsPackage === 'standard') {
+    list = list.filter(b => b.packageId && b.packageId.startsWith('standard'));
+  }
+
+  return list;
+}
+
 function renderReportsView() {
   const grid = document.getElementById('reports-grid-content');
   if (!grid) return;
@@ -1989,20 +2013,11 @@ function renderReportsView() {
   setupReportsPeriodFilter();
 
   const allBookings = store.getAll();
+  const periodBookings = getPeriodBookings();
   const bookings = getFilteredReportsBookings();
   const total = bookings.length || 1;
 
-  // Status metrics
-  const confirmedCount = bookings.filter(b => b.status === 'confirmed').length;
-  const inProgressCount = bookings.filter(b => b.status === 'in_progress').length;
-  const pendingCount = bookings.filter(b => b.status === 'pending').length;
-  const completedCount = bookings.filter(b => b.status === 'completed').length;
-
-  const confirmedPct = Math.round((confirmedCount / total) * 100);
-  const otherCount = total - confirmedCount;
-  const otherPct = Math.max(0, 100 - confirmedPct);
-
-  // Update pill counts in header matching user's Screenshot 3
+  // Update pill counts in header matching period tabs
   const todayStr = new Date().toISOString().split('T')[0];
   const todayCount = allBookings.filter(b => b.date === todayStr).length;
   const weekendCount = allBookings.filter(b => {
@@ -2022,18 +2037,47 @@ function renderReportsView() {
     setupReportsPeriodFilter();
   }
 
-  // Formula counts & revenues
-  const funCount = bookings.filter(b => b.packageId === 'fun').length;
-  const vipCount = bookings.filter(b => b.packageId === 'vip').length;
-  const sweetCount = bookings.filter(b => b.packageId === 'sweet').length;
-  const standardCount = bookings.filter(b => b.packageId && b.packageId.startsWith('standard')).length;
+  // Package scoped bookings for Donut Chart
+  const packageScopedBookings = periodBookings.filter(b => {
+    if (currentReportsPackage === 'all') return true;
+    if (currentReportsPackage === 'fun') return b.packageId === 'fun';
+    if (currentReportsPackage === 'vip') return b.packageId === 'vip';
+    if (currentReportsPackage === 'sweet') return b.packageId === 'sweet';
+    if (currentReportsPackage === 'standard') return b.packageId && b.packageId.startsWith('standard');
+    return true;
+  });
+  const donutTotal = packageScopedBookings.length || 1;
+  const confirmedCount = packageScopedBookings.filter(b => b.status === 'confirmed').length;
+  const pendingCount = packageScopedBookings.filter(b => b.status !== 'confirmed').length;
+  const confirmedPct = Math.round((confirmedCount / donutTotal) * 100);
+  const pendingPct = Math.max(0, 100 - confirmedPct);
 
-  const funRev = bookings.filter(b => b.packageId === 'fun').reduce((s, b) => s + (b.totalAmount || 0), 0);
-  const vipRev = bookings.filter(b => b.packageId === 'vip').reduce((s, b) => s + (b.totalAmount || 0), 0);
-  const sweetRev = bookings.filter(b => b.packageId === 'sweet').reduce((s, b) => s + (b.totalAmount || 0), 0);
-  const standardRev = bookings.filter(b => b.packageId && b.packageId.startsWith('standard')).reduce((s, b) => s + (b.totalAmount || 0), 0);
+  // SVG Geometry for Donut Chart
+  const r = 68;
+  const C = 2 * Math.PI * r;
+  const gap = 14;
+  const arc1Len = Math.max(0, Math.round((confirmedPct / 100) * C - gap));
+  const arc2Len = Math.max(0, Math.round((pendingPct / 100) * C - gap));
 
-  // Financial aggregates
+  // Formula counts & revenues scoped by status filter
+  const statusScopedBookings = periodBookings.filter(b => {
+    if (currentReportsStatus === 'all') return true;
+    if (currentReportsStatus === 'confirmed') return b.status === 'confirmed';
+    if (currentReportsStatus === 'pending') return b.status !== 'confirmed';
+    return true;
+  });
+  const formulaTotal = statusScopedBookings.length || 1;
+  const funCount = statusScopedBookings.filter(b => b.packageId === 'fun').length;
+  const vipCount = statusScopedBookings.filter(b => b.packageId === 'vip').length;
+  const sweetCount = statusScopedBookings.filter(b => b.packageId === 'sweet').length;
+  const standardCount = statusScopedBookings.filter(b => b.packageId && b.packageId.startsWith('standard')).length;
+
+  const funRev = statusScopedBookings.filter(b => b.packageId === 'fun').reduce((s, b) => s + (b.totalAmount || 0), 0);
+  const vipRev = statusScopedBookings.filter(b => b.packageId === 'vip').reduce((s, b) => s + (b.totalAmount || 0), 0);
+  const sweetRev = statusScopedBookings.filter(b => b.packageId === 'sweet').reduce((s, b) => s + (b.totalAmount || 0), 0);
+  const standardRev = statusScopedBookings.filter(b => b.packageId && b.packageId.startsWith('standard')).reduce((s, b) => s + (b.totalAmount || 0), 0);
+
+  // Financial aggregates (fully filtered)
   const totalRevenue = bookings.reduce((sum, b) => sum + (b.totalAmount || 0), 0);
   const totalDeposits = bookings.reduce((sum, b) => sum + (b.depositPaid || 0), 0);
   const totalBalances = bookings.reduce((sum, b) => sum + (b.balanceDue || 0), 0);
@@ -2041,13 +2085,13 @@ function renderReportsView() {
   const avgPerBooking = bookings.length ? Math.round(totalRevenue / bookings.length) : 0;
   const avgPerPlayer = totalPlayers ? (totalRevenue / totalPlayers).toFixed(1) : 0;
 
-  // Addons Aggregates
+  // Addons Aggregates (fully filtered)
   const addonStats = {
-    cake: { name: "Gâteau Chocolat", img: "/images/addon-cake.jpg", count: 0, total: 0 },
-    arcade: { name: "Jetons Arcade Extra", img: "/images/addon-arcade.avif", count: 0, total: 0 },
-    laser: { name: "Ronde Laser Extra", img: "/images/addon-laser.avif", count: 0, total: 0 },
-    minigolf: { name: "Minigolf Fluo 18 Trous", img: "/images/addon-minigolf-real.avif", count: 0, total: 0 },
-    drinks: { name: "Pichets Softs & Boissons", img: "/images/addon-drinks.avif", count: 0, total: 0 }
+    cake: { count: 0, total: 0 },
+    arcade: { count: 0, total: 0 },
+    laser: { count: 0, total: 0 },
+    minigolf: { count: 0, total: 0 },
+    drinks: { count: 0, total: 0 }
   };
 
   bookings.forEach(b => {
@@ -2056,19 +2100,19 @@ function renderReportsView() {
         const id = (a.id || '').toLowerCase();
         const totalA = a.total || (a.qty * (a.unitPrice || 0)) || 0;
         const qtyA = a.qty || 1;
-        if (id.includes('cake')) {
+        if (id.includes('cake') || id.includes('gateau') || id.includes('taart')) {
           addonStats.cake.count += qtyA;
           addonStats.cake.total += totalA;
-        } else if (id.includes('arcade')) {
+        } else if (id.includes('arcade') || id.includes('jeton')) {
           addonStats.arcade.count += qtyA;
           addonStats.arcade.total += totalA;
         } else if (id.includes('laser') || id.includes('extra_game')) {
           addonStats.laser.count += qtyA;
           addonStats.laser.total += totalA;
-        } else if (id.includes('minigolf')) {
+        } else if (id.includes('golf')) {
           addonStats.minigolf.count += qtyA;
           addonStats.minigolf.total += totalA;
-        } else if (id.includes('pitcher') || id.includes('drink')) {
+        } else if (id.includes('pitcher') || id.includes('drink') || id.includes('boisson')) {
           addonStats.drinks.count += qtyA;
           addonStats.drinks.total += totalA;
         }
@@ -2076,15 +2120,48 @@ function renderReportsView() {
     }
   });
 
-  // SVG Geometry for Donut Chart (Screenshot 4)
-  const r = 68;
-  const C = 2 * Math.PI * r;
-  const gap = 14;
-  const arc1Len = Math.max(0, Math.round((confirmedPct / 100) * C - gap));
-  const arc2Len = Math.max(0, Math.round((otherPct / 100) * C - gap));
+  const extrasGrandTotal = addonStats.cake.total + addonStats.arcade.total + addonStats.laser.total + addonStats.minigolf.total + addonStats.drinks.total;
+
+  // Dynamic Arena Occupancy Metrics
+  const jungleBookings = bookings.filter(b => (b.arena || 'jungle') === 'jungle');
+  const prisonBookings = bookings.filter(b => b.arena === 'prison');
+  const minigolfBookings = bookings.filter(b => b.addons && b.addons.some(a => (a.id || '').toLowerCase().includes('golf')));
+  const tablesBookings = bookings.filter(b => b.tableNumber || b.packageId);
+
+  const junglePlayers = jungleBookings.reduce((s, b) => s + (b.players || 0), 0);
+  const prisonPlayers = prisonBookings.reduce((s, b) => s + (b.players || 0), 0);
+  const minigolfPlayers = minigolfBookings.reduce((s, b) => s + (b.players || 0), 0);
+
+  const junglePct = bookings.length ? Math.min(100, Math.round((jungleBookings.length / bookings.length) * 100)) : 0;
+  const prisonPct = bookings.length ? Math.min(100, Math.round((prisonBookings.length / bookings.length) * 100)) : 0;
+  const minigolfPct = bookings.length ? Math.min(100, Math.round((minigolfBookings.length / bookings.length) * 100)) : 0;
+  const tablesPct = bookings.length ? Math.min(100, Math.round((tablesBookings.length / bookings.length) * 100)) : 0;
+
+  const hasActiveFilters = currentReportsStatus !== 'all' || currentReportsPackage !== 'all';
 
   grid.innerHTML = `
-    <!-- CARD 1: Status des Réservations & Donut Chart (Exact Recreation from Screenshot 4) -->
+    ${hasActiveFilters ? `
+      <div class="active-filters-bar" style="grid-column: 1 / -1;">
+        <span style="font-weight:700; color:var(--text-white);">Filtres actifs :</span>
+        ${currentReportsStatus !== 'all' ? `
+          <span class="active-filter-tag" id="clear-status-tag" title="Supprimer ce filtre">
+            <span>Statut: ${currentReportsStatus === 'confirmed' ? t('statusConfirmed') : t('statusPending')}</span>
+            <span style="font-size:1.15rem; line-height:1; font-weight:900;">&times;</span>
+          </span>
+        ` : ''}
+        ${currentReportsPackage !== 'all' ? `
+          <span class="active-filter-tag" id="clear-package-tag" title="Supprimer ce filtre">
+            <span>Formule: ${currentReportsPackage === 'fun' ? 'Fun' : (currentReportsPackage === 'vip' ? 'VIP' : (currentReportsPackage === 'sweet' ? 'Sweet' : 'Standard'))}</span>
+            <span style="font-size:1.15rem; line-height:1; font-weight:900;">&times;</span>
+          </span>
+        ` : ''}
+        <button type="button" id="clear-all-reports-filters" class="btn btn-secondary btn-sm" style="padding:4px 12px; font-size:0.78rem; border-radius:var(--radius-full); margin-left:auto;">
+          Tout reinitialiser
+        </button>
+      </div>
+    ` : ''}
+
+    <!-- CARD 1: Statut des Reservations & Donut Chart -->
     <div class="report-card">
       <div class="report-card-head">
         <h3 class="report-card-title">${t('bookingStatusTitle')}</h3>
@@ -2093,49 +2170,55 @@ function renderReportsView() {
         </span>
       </div>
 
-      <div class="donut-wrapper">
-        <!-- Floating Tooltip (Screenshot 4) -->
-        <div class="donut-tooltip">
-          <span>${t('statusConfirmed')} : <strong>${confirmedCount} (${confirmedPct}%)</strong></span>
+      <div class="donut-wrapper" style="position:relative;">
+        <!-- Dynamic Floating Tooltip (Hidden by default, shown strictly on hover) -->
+        <div class="donut-tooltip" id="donut-dynamic-tooltip" style="opacity:0; visibility:hidden;">
+          <span id="donut-dynamic-tooltip-text"></span>
         </div>
 
         <svg width="220" height="220" viewBox="0 0 240 240" style="overflow:visible;">
           <!-- Background track -->
           <circle cx="120" cy="120" r="${r}" fill="none" stroke="var(--bg-surface)" stroke-width="26" />
           
-          <!-- Blue Arc: Confirmés (starts top-right) -->
-          <circle cx="120" cy="120" r="${r}" fill="none" stroke="#2563eb" stroke-width="26" stroke-linecap="round"
+          <!-- Blue Arc: Confirmes -->
+          <circle id="donut-arc-confirmed" class="donut-arc ${currentReportsStatus === 'confirmed' ? 'active-arc' : ''}"
+            cx="120" cy="120" r="${r}" fill="none" stroke="#2563eb" stroke-width="26" stroke-linecap="round"
             stroke-dasharray="${arc1Len} ${C - arc1Len}"
             stroke-dashoffset="-7"
-            transform="rotate(-90 120 120)" />
+            transform="rotate(-90 120 120)"
+            style="${currentReportsStatus === 'pending' ? 'opacity:0.35;' : 'opacity:1;'}" />
 
-          <!-- Orange Arc: En attente / Solde (starts after gap) -->
-          <circle cx="120" cy="120" r="${r}" fill="none" stroke="#f59e0b" stroke-width="26" stroke-linecap="round"
+          <!-- Orange Arc: En attente / Solde -->
+          <circle id="donut-arc-pending" class="donut-arc ${currentReportsStatus === 'pending' ? 'active-arc' : ''}"
+            cx="120" cy="120" r="${r}" fill="none" stroke="#f59e0b" stroke-width="26" stroke-linecap="round"
             stroke-dasharray="${arc2Len} ${C - arc2Len}"
             stroke-dashoffset="-${arc1Len + gap + 7}"
-            transform="rotate(-90 120 120)" />
+            transform="rotate(-90 120 120)"
+            style="${currentReportsStatus === 'confirmed' ? 'opacity:0.35;' : 'opacity:1;'}" />
 
-          <!-- Center Circle with Total (Screenshot 4) -->
-          <circle cx="120" cy="120" r="46" fill="#1e293b" />
-          <text x="120" y="117" text-anchor="middle" font-size="28" font-weight="800" fill="#ffffff" font-family="'Plus Jakarta Sans', sans-serif">${bookings.length}</text>
-          <text x="120" y="134" text-anchor="middle" font-size="8" font-weight="800" fill="#94a3b8" letter-spacing="1" font-family="'Plus Jakarta Sans', sans-serif">${t('centerReservationsLabel')}</text>
+          <!-- Center Circle with Total Button -->
+          <g id="donut-center-btn" class="donut-center-btn" title="Cliquer pour reinitialiser le filtre statut">
+            <circle cx="120" cy="120" r="46" fill="#1e293b" />
+            <text x="120" y="117" text-anchor="middle" font-size="28" font-weight="800" fill="#ffffff" font-family="'Plus Jakarta Sans', sans-serif">${bookings.length}</text>
+            <text x="120" y="134" text-anchor="middle" font-size="8" font-weight="800" fill="#94a3b8" letter-spacing="1" font-family="'Plus Jakarta Sans', sans-serif">${t('centerReservationsLabel')}</text>
+          </g>
         </svg>
       </div>
 
-      <!-- Bottom Legend Pills (Screenshot 4) -->
+      <!-- Bottom Legend Pills (Clickable filters) -->
       <div class="donut-legend-grid">
-        <div class="donut-legend-pill">
+        <div class="donut-legend-pill ${currentReportsStatus === 'confirmed' ? 'active' : ''}" id="pill-filter-confirmed" title="Filtrer par reservations confirmees">
           <span class="donut-legend-dot" style="background:#2563eb;"></span>
           <span>${t('statusConfirmed')} : <strong style="color:var(--text-white); margin-left:4px;">${confirmedCount}</strong> <span style="color:var(--text-muted); margin-left:3px;">(${confirmedPct}%)</span></span>
         </div>
-        <div class="donut-legend-pill">
+        <div class="donut-legend-pill ${currentReportsStatus === 'pending' ? 'active' : ''}" id="pill-filter-pending" title="Filtrer par reservations en attente">
           <span class="donut-legend-dot" style="background:#f59e0b;"></span>
-          <span>${t('statusPending')} : <strong style="color:var(--text-white); margin-left:4px;">${otherCount}</strong> <span style="color:var(--text-muted); margin-left:3px;">(${otherPct}%)</span></span>
+          <span>${t('statusPending')} : <strong style="color:var(--text-white); margin-left:4px;">${pendingCount}</strong> <span style="color:var(--text-muted); margin-left:3px;">(${pendingPct}%)</span></span>
         </div>
       </div>
     </div>
 
-    <!-- CARD 2: Répartition par Formule Anniversaire -->
+    <!-- CARD 2: Repartition par Formule Anniversaire (Clickable filters) -->
     <div class="report-card">
       <div class="report-card-head">
         <h3 class="report-card-title">${t('packageBreakdownTitle')}</h3>
@@ -2146,7 +2229,8 @@ function renderReportsView() {
 
       <div style="display:flex; flex-direction:column; gap:12px; margin-top:6px;">
         <!-- Formule Fun -->
-        <div class="report-extra-item">
+        <div class="report-extra-item report-interactive-item ${currentReportsPackage === 'fun' ? 'active' : ''}" data-pkg="fun"
+          style="${currentReportsPackage !== 'all' && currentReportsPackage !== 'fun' ? 'opacity:0.4;' : 'opacity:1;'}" title="Filtrer par Formule Fun">
           <img src="/images/package-fun.jpg" alt="Formule Fun" style="width:42px; height:42px; border-radius:10px; object-fit:cover; border:1px solid var(--border-subtle); flex-shrink:0;">
           <div style="flex-grow:1; min-width:0;">
             <div style="display:flex; justify-content:space-between; align-items:baseline;">
@@ -2155,16 +2239,17 @@ function renderReportsView() {
             </div>
             <div style="display:flex; justify-content:space-between; align-items:center; font-size:0.78rem; color:var(--text-secondary); margin-top:2px;">
               <span>${funCount} · ${t('standard2Title')}</span>
-              <span style="font-weight:700;">${Math.round((funCount / total) * 100)}%</span>
+              <span style="font-weight:700;">${Math.round((funCount / formulaTotal) * 100)}%</span>
             </div>
             <div class="gauge-bar-track" style="margin-top:5px; height:6px;">
-              <div class="gauge-bar-fill" style="width:${Math.round((funCount / total) * 100)}%; background:var(--laser-green);"></div>
+              <div class="gauge-bar-fill" style="width:${Math.round((funCount / formulaTotal) * 100)}%; background:var(--laser-green);"></div>
             </div>
           </div>
         </div>
 
         <!-- Formule VIP -->
-        <div class="report-extra-item">
+        <div class="report-extra-item report-interactive-item ${currentReportsPackage === 'vip' ? 'active' : ''}" data-pkg="vip"
+          style="${currentReportsPackage !== 'all' && currentReportsPackage !== 'vip' ? 'opacity:0.4;' : 'opacity:1;'}" title="Filtrer par Formule VIP">
           <img src="/images/package-vip.jpg" alt="Formule VIP" style="width:42px; height:42px; border-radius:10px; object-fit:cover; border:1px solid var(--border-subtle); flex-shrink:0;">
           <div style="flex-grow:1; min-width:0;">
             <div style="display:flex; justify-content:space-between; align-items:baseline;">
@@ -2173,16 +2258,17 @@ function renderReportsView() {
             </div>
             <div style="display:flex; justify-content:space-between; align-items:center; font-size:0.78rem; color:var(--text-secondary); margin-top:2px;">
               <span>${vipCount} · VIP Menu + Champagne</span>
-              <span style="font-weight:700;">${Math.round((vipCount / total) * 100)}%</span>
+              <span style="font-weight:700;">${Math.round((vipCount / formulaTotal) * 100)}%</span>
             </div>
             <div class="gauge-bar-track" style="margin-top:5px; height:6px;">
-              <div class="gauge-bar-fill" style="width:${Math.round((vipCount / total) * 100)}%; background:var(--laser-pink);"></div>
+              <div class="gauge-bar-fill" style="width:${Math.round((vipCount / formulaTotal) * 100)}%; background:var(--laser-pink);"></div>
             </div>
           </div>
         </div>
 
         <!-- Formule Sweet -->
-        <div class="report-extra-item">
+        <div class="report-extra-item report-interactive-item ${currentReportsPackage === 'sweet' ? 'active' : ''}" data-pkg="sweet"
+          style="${currentReportsPackage !== 'all' && currentReportsPackage !== 'sweet' ? 'opacity:0.4;' : 'opacity:1;'}" title="Filtrer par Formule Sweet">
           <img src="/images/package-sweet.jpg" alt="Formule Sweet" style="width:42px; height:42px; border-radius:10px; object-fit:cover; border:1px solid var(--border-subtle); flex-shrink:0;">
           <div style="flex-grow:1; min-width:0;">
             <div style="display:flex; justify-content:space-between; align-items:baseline;">
@@ -2191,16 +2277,17 @@ function renderReportsView() {
             </div>
             <div style="display:flex; justify-content:space-between; align-items:center; font-size:0.78rem; color:var(--text-secondary); margin-top:2px;">
               <span>${sweetCount} · Donuts & Softs</span>
-              <span style="font-weight:700;">${Math.round((sweetCount / total) * 100)}%</span>
+              <span style="font-weight:700;">${Math.round((sweetCount / formulaTotal) * 100)}%</span>
             </div>
             <div class="gauge-bar-track" style="margin-top:5px; height:6px;">
-              <div class="gauge-bar-fill" style="width:${Math.round((sweetCount / total) * 100)}%; background:var(--laser-cyan);"></div>
+              <div class="gauge-bar-fill" style="width:${Math.round((sweetCount / formulaTotal) * 100)}%; background:var(--laser-cyan);"></div>
             </div>
           </div>
         </div>
 
         <!-- Standard / Parties Choc -->
-        <div class="report-extra-item">
+        <div class="report-extra-item report-interactive-item ${currentReportsPackage === 'standard' ? 'active' : ''}" data-pkg="standard"
+          style="${currentReportsPackage !== 'all' && currentReportsPackage !== 'standard' ? 'opacity:0.4;' : 'opacity:1;'}" title="Filtrer par Parties Choc Standard">
           <img src="/images/package-standard.jpg" alt="Parties Choc" style="width:42px; height:42px; border-radius:10px; object-fit:cover; border:1px solid var(--border-subtle); flex-shrink:0;">
           <div style="flex-grow:1; min-width:0;">
             <div style="display:flex; justify-content:space-between; align-items:baseline;">
@@ -2209,17 +2296,17 @@ function renderReportsView() {
             </div>
             <div style="display:flex; justify-content:space-between; align-items:center; font-size:0.78rem; color:var(--text-secondary); margin-top:2px;">
               <span>${standardCount} · Standard Laser</span>
-              <span style="font-weight:700;">${Math.round((standardCount / total) * 100)}%</span>
+              <span style="font-weight:700;">${Math.round((standardCount / formulaTotal) * 100)}%</span>
             </div>
             <div class="gauge-bar-track" style="margin-top:5px; height:6px;">
-              <div class="gauge-bar-fill" style="width:${Math.round((standardCount / total) * 100)}%; background:var(--laser-amber);"></div>
+              <div class="gauge-bar-fill" style="width:${Math.round((standardCount / formulaTotal) * 100)}%; background:var(--laser-amber);"></div>
             </div>
           </div>
         </div>
       </div>
     </div>
 
-    <!-- CARD 3: Taux d'Occupation des Arènes & Salles -->
+    <!-- CARD 3: Taux d'Occupation des Arenes & Salles (Dynamically calculated) -->
     <div class="report-card">
       <div class="report-card-head">
         <h3 class="report-card-title">${t('navCapacity')}</h3>
@@ -2235,12 +2322,12 @@ function renderReportsView() {
               <span style="width:10px; height:10px; border-radius:50%; background:var(--laser-green); display:inline-block;"></span>
               ${t('arenaJungle')}
             </span>
-            <span class="gauge-val" style="color:var(--laser-green);">88%</span>
+            <span class="gauge-val" style="color:var(--laser-green);">${junglePct}% (${junglePlayers} pers.)</span>
           </div>
           <div class="gauge-bar-track">
-            <div class="gauge-bar-fill" style="width:88%; background:var(--laser-green);"></div>
+            <div class="gauge-bar-fill" style="width:${junglePct}%; background:var(--laser-green);"></div>
           </div>
-          <div style="font-size:0.75rem; color:var(--text-muted);">14:00 - 18:00</div>
+          <div style="font-size:0.75rem; color:var(--text-muted);">${jungleBookings.length} sessions · 14:00 - 18:00</div>
         </div>
 
         <div class="gauge-item">
@@ -2249,12 +2336,12 @@ function renderReportsView() {
               <span style="width:10px; height:10px; border-radius:50%; background:var(--laser-cyan); display:inline-block;"></span>
               ${t('arenaPrison')}
             </span>
-            <span class="gauge-val" style="color:var(--laser-cyan);">78%</span>
+            <span class="gauge-val" style="color:var(--laser-cyan);">${prisonPct}% (${prisonPlayers} pers.)</span>
           </div>
           <div class="gauge-bar-track">
-            <div class="gauge-bar-fill" style="width:78%; background:var(--laser-cyan);"></div>
+            <div class="gauge-bar-fill" style="width:${prisonPct}%; background:var(--laser-cyan);"></div>
           </div>
-          <div style="font-size:0.75rem; color:var(--text-muted);">16:00 - 20:00</div>
+          <div style="font-size:0.75rem; color:var(--text-muted);">${prisonBookings.length} sessions · 16:00 - 20:00</div>
         </div>
 
         <div class="gauge-item">
@@ -2263,12 +2350,12 @@ function renderReportsView() {
               <span style="width:10px; height:10px; border-radius:50%; background:var(--laser-amber); display:inline-block;"></span>
               ${t('facilityMinigolf')}
             </span>
-            <span class="gauge-val" style="color:var(--laser-amber);">65%</span>
+            <span class="gauge-val" style="color:var(--laser-amber);">${minigolfPct}% (${minigolfPlayers} pers.)</span>
           </div>
           <div class="gauge-bar-track">
-            <div class="gauge-bar-fill" style="width:65%; background:var(--laser-amber);"></div>
+            <div class="gauge-bar-fill" style="width:${minigolfPct}%; background:var(--laser-amber);"></div>
           </div>
-          <div style="font-size:0.75rem; color:var(--text-muted);">Combo Laser + Minigolf</div>
+          <div style="font-size:0.75rem; color:var(--text-muted);">${minigolfBookings.length} options Combo Laser + Minigolf</div>
         </div>
 
         <div class="gauge-item">
@@ -2277,35 +2364,35 @@ function renderReportsView() {
               <span style="width:10px; height:10px; border-radius:50%; background:var(--laser-pink); display:inline-block;"></span>
               ${t('tablesArea')}
             </span>
-            <span class="gauge-val" style="color:var(--laser-pink);">94%</span>
+            <span class="gauge-val" style="color:var(--laser-pink);">${tablesPct}%</span>
           </div>
           <div class="gauge-bar-track">
-            <div class="gauge-bar-fill" style="width:94%; background:var(--laser-pink);"></div>
+            <div class="gauge-bar-fill" style="width:${tablesPct}%; background:var(--laser-pink);"></div>
           </div>
-          <div style="font-size:0.75rem; color:var(--text-muted);">Rotation 2h - 3h</div>
+          <div style="font-size:0.75rem; color:var(--text-muted);">${tablesBookings.length} tables assignees · Rotation 2h - 3h</div>
         </div>
       </div>
     </div>
 
-    <!-- CARD 4: Top Extras & Ventes Additionnelles -->
+    <!-- CARD 4: Top Extras & Ventes Additionnelles (Dynamically filtered) -->
     <div class="report-card">
       <div class="report-card-head">
         <h3 class="report-card-title">${t('extrasSalesTitle')}</h3>
         <span class="badge" style="background:rgba(0,240,255,0.12); color:var(--laser-cyan); font-weight:700; border-radius:var(--radius-full); padding:4px 10px;">
-          +${formatMoney(addonStats.cake.total + addonStats.arcade.total + addonStats.laser.total + addonStats.minigolf.total + addonStats.drinks.total)}
+          +${formatMoney(extrasGrandTotal)}
         </span>
       </div>
 
       <div style="display:flex; flex-direction:column; gap:10px;">
         <div class="report-extra-item">
-          <img src="/images/addon-cake.jpg" alt="Gâteau Chocolat" style="width:44px; height:44px; border-radius:10px; object-fit:cover; border:1px solid var(--border-subtle); flex-shrink:0;">
+          <img src="/images/addon-cake.jpg" alt="Gateau Chocolat" style="width:44px; height:44px; border-radius:10px; object-fit:cover; border:1px solid var(--border-subtle); flex-shrink:0;">
           <div style="flex-grow:1; min-width:0;">
             <div style="display:flex; justify-content:space-between; align-items:baseline;">
               <strong style="color:var(--text-white); font-size:0.9rem;">${t('addonCake')}</strong>
-              <span style="font-weight:800; color:var(--laser-cyan); font-size:0.92rem;">+${formatMoney(addonStats.cake.total || 180)}</span>
+              <span style="font-weight:800; color:var(--laser-cyan); font-size:0.92rem;">+${formatMoney(addonStats.cake.total)}</span>
             </div>
             <div style="font-size:0.78rem; color:var(--text-secondary); margin-top:2px;">
-              ${addonStats.cake.count || 30} · ${t('addonCakePrice')}
+              ${addonStats.cake.count} commandes · ${t('addonCakePrice')}
             </div>
           </div>
         </div>
@@ -2315,10 +2402,10 @@ function renderReportsView() {
           <div style="flex-grow:1; min-width:0;">
             <div style="display:flex; justify-content:space-between; align-items:baseline;">
               <strong style="color:var(--text-white); font-size:0.9rem;">${t('addonArcade')}</strong>
-              <span style="font-weight:800; color:var(--laser-green); font-size:0.92rem;">+${formatMoney(addonStats.arcade.total || 240)}</span>
+              <span style="font-weight:800; color:var(--laser-green); font-size:0.92rem;">+${formatMoney(addonStats.arcade.total)}</span>
             </div>
             <div style="font-size:0.78rem; color:var(--text-secondary); margin-top:2px;">
-              ${addonStats.arcade.count || 120} · ${t('addonArcadePrice')}
+              ${addonStats.arcade.count} jetons · ${t('addonArcadePrice')}
             </div>
           </div>
         </div>
@@ -2328,10 +2415,10 @@ function renderReportsView() {
           <div style="flex-grow:1; min-width:0;">
             <div style="display:flex; justify-content:space-between; align-items:baseline;">
               <strong style="color:var(--text-white); font-size:0.9rem;">${t('addonLaserGame')}</strong>
-              <span style="font-weight:800; color:var(--laser-pink); font-size:0.92rem;">+${formatMoney(addonStats.laser.total || 196)}</span>
+              <span style="font-weight:800; color:var(--laser-pink); font-size:0.92rem;">+${formatMoney(addonStats.laser.total)}</span>
             </div>
             <div style="font-size:0.78rem; color:var(--text-secondary); margin-top:2px;">
-              ${addonStats.laser.count || 28} · ${t('addonLaserGamePrice')}
+              ${addonStats.laser.count} parties · ${t('addonLaserGamePrice')}
             </div>
           </div>
         </div>
@@ -2341,10 +2428,10 @@ function renderReportsView() {
           <div style="flex-grow:1; min-width:0;">
             <div style="display:flex; justify-content:space-between; align-items:baseline;">
               <strong style="color:var(--text-white); font-size:0.9rem;">${t('addonMiniGolf')}</strong>
-              <span style="font-weight:800; color:var(--laser-amber); font-size:0.92rem;">+${formatMoney(addonStats.minigolf.total || 128)}</span>
+              <span style="font-weight:800; color:var(--laser-amber); font-size:0.92rem;">+${formatMoney(addonStats.minigolf.total)}</span>
             </div>
             <div style="font-size:0.78rem; color:var(--text-secondary); margin-top:2px;">
-              ${addonStats.minigolf.count || 16} · ${t('addonMiniGolfPrice')}
+              ${addonStats.minigolf.count} entrees · ${t('addonMiniGolfPrice')}
             </div>
           </div>
         </div>
@@ -2354,17 +2441,17 @@ function renderReportsView() {
           <div style="flex-grow:1; min-width:0;">
             <div style="display:flex; justify-content:space-between; align-items:baseline;">
               <strong style="color:var(--text-white); font-size:0.9rem;">${t('addonDrinks')}</strong>
-              <span style="font-weight:800; color:var(--laser-cyan); font-size:0.92rem;">+${formatMoney(addonStats.drinks.total || 108)}</span>
+              <span style="font-weight:800; color:var(--laser-cyan); font-size:0.92rem;">+${formatMoney(addonStats.drinks.total)}</span>
             </div>
             <div style="font-size:0.78rem; color:var(--text-secondary); margin-top:2px;">
-              ${addonStats.drinks.count || 36} · ${t('addonDrinksPrice')}
+              ${addonStats.drinks.count} pichets · ${t('addonDrinksPrice')}
             </div>
           </div>
         </div>
       </div>
     </div>
 
-    <!-- CARD 5: Performance Financière & Encaissements -->
+    <!-- CARD 5: Performance Financiere & Encaissements (Dynamically filtered) -->
     <div class="report-card">
       <div class="report-card-head">
         <h3 class="report-card-title">${t('financialSummaryTitle')}</h3>
@@ -2396,6 +2483,111 @@ function renderReportsView() {
       </div>
     </div>
   `;
+
+  // Attach dynamic tooltip & interactive cross-filter handlers
+  const tooltipEl = document.getElementById('donut-dynamic-tooltip');
+  const tooltipText = document.getElementById('donut-dynamic-tooltip-text');
+  const arcConfirmed = document.getElementById('donut-arc-confirmed');
+  const arcPending = document.getElementById('donut-arc-pending');
+  const centerBtn = document.getElementById('donut-center-btn');
+
+  function showTooltip(html) {
+    if (!tooltipEl || !tooltipText) return;
+    tooltipText.innerHTML = html;
+    tooltipEl.classList.add('visible');
+    tooltipEl.style.opacity = '1';
+    tooltipEl.style.visibility = 'visible';
+  }
+
+  function hideTooltip() {
+    if (!tooltipEl) return;
+    tooltipEl.classList.remove('visible');
+    tooltipEl.style.opacity = '0';
+    tooltipEl.style.visibility = 'hidden';
+  }
+
+  if (arcConfirmed) {
+    arcConfirmed.addEventListener('mouseenter', () => {
+      showTooltip(`${t('statusConfirmed')} : <strong>${confirmedCount} (${confirmedPct}%)</strong>`);
+    });
+    arcConfirmed.addEventListener('mouseleave', hideTooltip);
+    arcConfirmed.addEventListener('click', () => {
+      currentReportsStatus = (currentReportsStatus === 'confirmed' ? 'all' : 'confirmed');
+      renderReportsView();
+    });
+  }
+
+  if (arcPending) {
+    arcPending.addEventListener('mouseenter', () => {
+      showTooltip(`${t('statusPending')} : <strong>${pendingCount} (${pendingPct}%)</strong>`);
+    });
+    arcPending.addEventListener('mouseleave', hideTooltip);
+    arcPending.addEventListener('click', () => {
+      currentReportsStatus = (currentReportsStatus === 'pending' ? 'all' : 'pending');
+      renderReportsView();
+    });
+  }
+
+  if (centerBtn) {
+    centerBtn.addEventListener('mouseenter', () => {
+      showTooltip(`Total affiche : <strong>${bookings.length} ${t('centerReservationsLabel')}</strong>`);
+    });
+    centerBtn.addEventListener('mouseleave', hideTooltip);
+    centerBtn.addEventListener('click', () => {
+      currentReportsStatus = 'all';
+      currentReportsPackage = 'all';
+      renderReportsView();
+    });
+  }
+
+  // Legend pills click listeners
+  const pillConfirmed = document.getElementById('pill-filter-confirmed');
+  if (pillConfirmed) {
+    pillConfirmed.onclick = () => {
+      currentReportsStatus = (currentReportsStatus === 'confirmed' ? 'all' : 'confirmed');
+      renderReportsView();
+    };
+  }
+  const pillPending = document.getElementById('pill-filter-pending');
+  if (pillPending) {
+    pillPending.onclick = () => {
+      currentReportsStatus = (currentReportsStatus === 'pending' ? 'all' : 'pending');
+      renderReportsView();
+    };
+  }
+
+  // Package breakdown rows click listeners
+  document.querySelectorAll('.report-interactive-item[data-pkg]').forEach(item => {
+    item.onclick = (e) => {
+      const pkg = e.currentTarget.dataset.pkg;
+      currentReportsPackage = (currentReportsPackage === pkg ? 'all' : pkg);
+      renderReportsView();
+    };
+  });
+
+  // Active filters banner listeners
+  const clearStatusTag = document.getElementById('clear-status-tag');
+  if (clearStatusTag) {
+    clearStatusTag.onclick = () => {
+      currentReportsStatus = 'all';
+      renderReportsView();
+    };
+  }
+  const clearPackageTag = document.getElementById('clear-package-tag');
+  if (clearPackageTag) {
+    clearPackageTag.onclick = () => {
+      currentReportsPackage = 'all';
+      renderReportsView();
+    };
+  }
+  const clearAllFiltersBtn = document.getElementById('clear-all-reports-filters');
+  if (clearAllFiltersBtn) {
+    clearAllFiltersBtn.onclick = () => {
+      currentReportsStatus = 'all';
+      currentReportsPackage = 'all';
+      renderReportsView();
+    };
+  }
 }
 
 // 4. BOOKING DETAIL MODAL DRAWER
