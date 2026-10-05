@@ -33,12 +33,26 @@ export const supabase = isSupabaseConfigured
 // Converteste un obiect booking din JS in format rand Supabase
 export function bookingToSupabaseRow(b) {
   if (!b) return null;
+  const timeSlot = b.timeSlot || (b.startTime ? `${b.startTime} - ${b.endTime || ''}` : '14:00 - 16:00');
+  const startTime = b.startTime || (timeSlot ? timeSlot.split(' - ')[0]?.trim() : '14:00');
+  let endTime = b.endTime || (timeSlot ? timeSlot.split(' - ')[1]?.trim() : '16:00');
+  if (!endTime) {
+    const sH = parseInt((startTime || '14:00').split(':')[0]) || 14;
+    endTime = `${String(sH + 2).padStart(2, '0')}:00`;
+  }
+  const payload = {
+    ...(b.payload || b),
+    startTime,
+    endTime,
+    arena: b.arena || 'jungle',
+    tableNumber: b.tableNumber ? Number(b.tableNumber) : 1
+  };
   return {
     id: b.id,
     order_number: b.orderNumber || null,
     order_code: b.orderCode || null,
     date: b.date || null,
-    time_slot: b.timeSlot || null,
+    time_slot: timeSlot,
     status: b.status || 'pending',
     customer_name: b.customerName || null,
     email: b.email || null,
@@ -54,7 +68,7 @@ export function bookingToSupabaseRow(b) {
     payment_status: b.paymentStatus || null,
     bar_tab_total: Number(b.barTabTotal || 0),
     lang: b.lang || 'fr',
-    payload: b, // Salveaza intregul obiect (echipe, consumatii, istoric mesaje etc.)
+    payload: payload,
     updated_at: new Date().toISOString()
   };
 }
@@ -63,26 +77,44 @@ export function bookingToSupabaseRow(b) {
 export function supabaseRowToBooking(row) {
   if (!row) return null;
   const base = (row.payload && typeof row.payload === 'object') ? { ...row.payload } : {};
+  const timeSlot = row.time_slot ?? base.timeSlot ?? '14:00 - 16:00';
+  let startTime = base.startTime;
+  let endTime = base.endTime;
+  if (!startTime && timeSlot) {
+    const parts = timeSlot.split(' - ');
+    startTime = parts[0]?.trim();
+    endTime = parts[1]?.trim();
+  }
+  if (!startTime) startTime = '14:00';
+  if (!endTime) {
+    const sH = parseInt(startTime.split(':')[0]) || 14;
+    endTime = `${String(sH + 2).padStart(2, '0')}:00`;
+  }
+  const tableNum = row.table_number != null ? Number(row.table_number) : (base.tableNumber != null ? Number(base.tableNumber) : 1);
+
   return {
     ...base,
     id: row.id,
     orderNumber: row.order_number ?? base.orderNumber,
     orderCode: row.order_code ?? base.orderCode,
     date: row.date ?? base.date,
-    timeSlot: row.time_slot ?? base.timeSlot,
-    status: row.status ?? base.status,
-    customerName: row.customer_name ?? base.customerName,
-    email: row.email ?? base.email,
-    phone: row.phone ?? base.phone,
-    players: row.players != null ? Number(row.players) : base.players,
-    tableNumber: row.table_number != null ? Number(row.table_number) : base.tableNumber,
-    packageId: row.package_id ?? base.packageId,
-    packageName: row.package_name ?? base.packageName,
+    timeSlot: timeSlot,
+    startTime: startTime,
+    endTime: endTime,
+    arena: base.arena || 'jungle',
+    tableNumber: tableNum,
+    status: row.status ?? base.status ?? 'pending',
+    customerName: row.customer_name ?? base.customerName ?? 'Client',
+    email: row.email ?? base.email ?? '',
+    phone: row.phone ?? base.phone ?? '',
+    players: row.players != null ? Number(row.players) : (base.players || 10),
+    packageId: row.package_id ?? base.packageId ?? 'standard2',
+    packageName: row.package_name ?? base.packageName ?? 'Formule Standard',
     totalAmount: Number(row.total_amount ?? base.totalAmount ?? 0),
     depositPaid: Number(row.deposit_paid ?? base.depositPaid ?? 0),
     balanceDue: Number(row.balance_due ?? base.balanceDue ?? 0),
-    paymentMethod: row.payment_method ?? base.paymentMethod,
-    paymentStatus: row.payment_status ?? base.paymentStatus,
+    paymentMethod: row.payment_method ?? base.paymentMethod ?? 'onsite',
+    paymentStatus: row.payment_status ?? base.paymentStatus ?? 'pending',
     barTabTotal: Number(row.bar_tab_total ?? base.barTabTotal ?? 0),
     lang: row.lang ?? base.lang ?? 'fr'
   };

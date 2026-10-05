@@ -413,128 +413,179 @@ function renderKPIs() {
 }
 
 // 1. TIMELINE SCHEDULER VIEW
+// 1. TIMELINE SCHEDULER VIEW
 function renderTimeline() {
-  const dateInput = document.getElementById('timeline-date-picker');
-  if (dateInput) {
-    dateInput.value = selectedDate;
-    dateInput.onchange = (e) => {
-      selectedDate = e.target.value;
-      renderTimeline();
-      renderKPIs();
-    };
-  }
-
-  const prevDateBtn = document.getElementById('timeline-prev-date');
-  const nextDateBtn = document.getElementById('timeline-next-date');
-  if (prevDateBtn) {
-    prevDateBtn.onclick = () => {
-      const d = new Date(selectedDate);
-      d.setDate(d.getDate() - 1);
-      selectedDate = d.toISOString().split('T')[0];
-      if (dateInput) dateInput.value = selectedDate;
-      renderTimeline();
-      renderKPIs();
-    };
-  }
-  if (nextDateBtn) {
-    nextDateBtn.onclick = () => {
-      const d = new Date(selectedDate);
-      d.setDate(d.getDate() + 1);
-      selectedDate = d.toISOString().split('T')[0];
-      if (dateInput) dateInput.value = selectedDate;
-      renderTimeline();
-      renderKPIs();
-    };
-  }
-
-  const hours = ["11:00", "12:00", "13:00", "14:00", "15:00", "16:00", "17:00", "18:00", "19:00", "20:00", "21:00", "22:00"];
-  const resources = [
-    { id: "jungle", name: t('arenaJungle'), type: "arena", iconSvg: icon('tree', 'text-green', 15) },
-    { id: "prison", name: t('arenaPrison'), type: "arena", iconSvg: icon('lock', 'text-cyan', 15) },
-    { id: "minigolf", name: t('facilityMinigolf'), type: "facility", iconSvg: icon('flag', 'text-amber', 15) },
-    { id: "table1", name: "Table 1 (VIP)", type: "table", iconSvg: icon('crown', 'text-pink', 15) },
-    { id: "table2", name: `Table 2 (${t('snack')})`, type: "table", iconSvg: icon('table', 'text-secondary', 15) },
-    { id: "table3", name: `Table 3 (${t('snack')})`, type: "table", iconSvg: icon('table', 'text-secondary', 15) },
-    { id: "table4", name: `Table 4 (${t('snack')})`, type: "table", iconSvg: icon('table', 'text-secondary', 15) },
-    { id: "table5", name: `Table 5 (${t('snack')})`, type: "table", iconSvg: icon('table', 'text-secondary', 15) }
-  ];
-
-  const gridEl = document.getElementById('timeline-grid-body');
-  if (!gridEl) return;
-
-  const dateBookings = store.getBookingsByDate(selectedDate);
-
-  let html = '';
-
-  // Header row
-  html += `<div class="resource-header-cell">${t('colResource')}</div>`;
-  hours.forEach(h => {
-    html += `<div class="time-header-cell">${h}</div>`;
-  });
-
-  // Resource rows
-  resources.forEach(res => {
-    html += `
-      <div class="resource-header-cell">
-        <span style="display:inline-flex; align-items:center;">${res.iconSvg}</span>
-        <span>${res.name}</span>
-      </div>
-    `;
-
-    hours.forEach(h => {
-      const hourInt = parseInt(h.split(':')[0]);
-
-      // Check if any booking matches this resource and time
-      const matchingBookings = dateBookings.filter(b => {
-        const startH = parseInt(b.startTime.split(':')[0]);
-        const endH = parseInt(b.endTime.split(':')[0]);
-
-        const matchesTime = (hourInt >= startH && hourInt < endH);
-
-        if (res.type === 'arena') {
-          return matchesTime && (b.arena === res.id || b.arena === 'combined');
-        } else if (res.type === 'table') {
-          const tNum = parseInt(res.id.replace('table', ''));
-          return matchesTime && b.tableNumber === tNum;
-        } else if (res.id === 'minigolf') {
-          return matchesTime && (b.addons && b.addons.some(a => a.id === 'extra_game'));
+  try {
+    const dateInput = document.getElementById('timeline-date-picker');
+    if (dateInput) {
+      dateInput.value = selectedDate;
+      dateInput.onchange = (e) => {
+        if (e.target.value) {
+          selectedDate = e.target.value;
+          renderTimeline();
+          renderKPIs();
         }
-        return false;
-      });
+      };
+    }
 
-      html += `<div class="timeline-cell" data-res="${res.id}" data-hour="${h}">`;
-      
-      matchingBookings.forEach(booking => {
-        const pkgClass = booking.packageId === 'sweet' ? 'block-sweet' :
-                         booking.packageId === 'fun' ? 'block-fun' :
-                         booking.packageId === 'vip' ? 'block-vip' : 'block-standard';
+    const shiftDate = (offsetDays) => {
+      try {
+        const parts = (selectedDate || '').split('-').map(Number);
+        const d = (parts.length === 3 && !isNaN(parts[0])) 
+          ? new Date(parts[0], parts[1] - 1, parts[2]) 
+          : new Date();
+        d.setDate(d.getDate() + offsetDays);
+        const y = d.getFullYear();
+        const m = String(d.getMonth() + 1).padStart(2, '0');
+        const day = String(d.getDate()).padStart(2, '0');
+        selectedDate = `${y}-${m}-${day}`;
+        if (dateInput) dateInput.value = selectedDate;
+        renderTimeline();
+        renderKPIs();
+      } catch (err) {
+        console.error('Error shifting date in timeline:', err);
+      }
+    };
 
-        const displayTitle = booking.childName ? `${booking.childName} (${booking.childAge}a)` : (booking.customerName || `Dossier #${booking.id}`);
+    const prevDateBtn = document.getElementById('timeline-prev-date');
+    const nextDateBtn = document.getElementById('timeline-next-date');
+    if (prevDateBtn) {
+      prevDateBtn.onclick = () => shiftDate(-1);
+    }
+    if (nextDateBtn) {
+      nextDateBtn.onclick = () => shiftDate(1);
+    }
 
-        html += `
-          <div class="booking-block ${pkgClass}" data-id="${booking.id}" title="${displayTitle} · ${booking.timeSlot} · ${booking.players} pers.">
-            <div class="block-title">${displayTitle}</div>
-            <div class="block-sub">
-              <span style="display:inline-flex; align-items:center; gap:3px; font-weight:600;">${icon('users', '', 11)} ${booking.players}p</span>
-              <span style="opacity:0.85;">· ${booking.startTime}</span>
+    const hours = ["11:00", "12:00", "13:00", "14:00", "15:00", "16:00", "17:00", "18:00", "19:00", "20:00", "21:00", "22:00"];
+    const resources = [
+      { id: "jungle", name: t('arenaJungle') || 'Arène 1 · Jungle (Max 22)', type: "arena", iconSvg: icon('tree', 'text-green', 15) },
+      { id: "prison", name: t('arenaPrison') || 'Arène 2 · Prison (Max 22)', type: "arena", iconSvg: icon('lock', 'text-cyan', 15) },
+      { id: "minigolf", name: t('facilityMinigolf') || 'Minigolf Fluo 18 Trous', type: "facility", iconSvg: icon('flag', 'text-amber', 15) },
+      { id: "table1", name: "Table 1 (VIP)", type: "table", iconSvg: icon('crown', 'text-pink', 15) },
+      { id: "table2", name: `Table 2 (${t('snack') || 'Goûter'})`, type: "table", iconSvg: icon('table', 'text-secondary', 15) },
+      { id: "table3", name: `Table 3 (${t('snack') || 'Goûter'})`, type: "table", iconSvg: icon('table', 'text-secondary', 15) },
+      { id: "table4", name: `Table 4 (${t('snack') || 'Goûter'})`, type: "table", iconSvg: icon('table', 'text-secondary', 15) },
+      { id: "table5", name: `Table 5 (${t('snack') || 'Goûter'})`, type: "table", iconSvg: icon('table', 'text-secondary', 15) }
+    ];
+
+    const gridEl = document.getElementById('timeline-grid-body');
+    if (!gridEl) return;
+
+    let dateBookings = [];
+    try {
+      dateBookings = store.getBookingsByDate(selectedDate) || [];
+    } catch (err) {
+      console.warn('Error fetching bookings by date:', err);
+      dateBookings = [];
+    }
+
+    let html = '';
+
+    // Header row
+    html += `<div class="resource-header-cell">${t('colResource') || 'Ressources & Salles'}</div>`;
+    hours.forEach(h => {
+      html += `<div class="time-header-cell">${h}</div>`;
+    });
+
+    // Resource rows
+    resources.forEach(res => {
+      html += `
+        <div class="resource-header-cell">
+          <span style="display:inline-flex; align-items:center;">${res.iconSvg}</span>
+          <span>${res.name}</span>
+        </div>
+      `;
+
+      hours.forEach(h => {
+        const hourInt = parseInt(h.split(':')[0], 10);
+
+        // Check if any booking matches this resource and time
+        const matchingBookings = dateBookings.filter(b => {
+          if (!b) return false;
+
+          let sTime = b.startTime;
+          let eTime = b.endTime;
+          if (!sTime && b.timeSlot) {
+            const parts = b.timeSlot.split(' - ');
+            sTime = parts[0]?.trim();
+            eTime = parts[1]?.trim();
+          }
+          if (!sTime) sTime = '14:00';
+          if (!eTime) {
+            const sH = parseInt(sTime.split(':')[0], 10) || 14;
+            eTime = `${String(sH + 2).padStart(2, '0')}:00`;
+          }
+
+          const startH = parseInt(sTime.split(':')[0], 10) || 0;
+          const endH = parseInt(eTime.split(':')[0], 10) || (startH + 2);
+
+          const matchesTime = (hourInt >= startH && hourInt < endH);
+          if (!matchesTime) return false;
+
+          if (res.type === 'arena') {
+            const arenaVal = (b.arena || 'jungle').toLowerCase();
+            return arenaVal === res.id || arenaVal === 'combined' || arenaVal === 'fusion';
+          } else if (res.type === 'table') {
+            const tNum = parseInt(res.id.replace('table', ''), 10);
+            const bookingTable = b.tableNumber != null ? Number(b.tableNumber) : null;
+            return bookingTable === tNum;
+          } else if (res.id === 'minigolf') {
+            return Array.isArray(b.addons) && b.addons.some(a => a && (a.id === 'extra_game' || a.id === 'minigolf'));
+          }
+          return false;
+        });
+
+        html += `<div class="timeline-cell" data-res="${res.id}" data-hour="${h}">`;
+        
+        matchingBookings.forEach(booking => {
+          const pkgClass = booking.packageId === 'sweet' ? 'block-sweet' :
+                           booking.packageId === 'fun' ? 'block-fun' :
+                           booking.packageId === 'vip' ? 'block-vip' : 'block-standard';
+
+          const displayTitle = booking.childName ? `${booking.childName} (${booking.childAge || 10}a)` : (booking.customerName || `Dossier #${booking.id}`);
+          const displayStart = booking.startTime || (booking.timeSlot ? booking.timeSlot.split(' - ')[0] : '14:00');
+          const displaySlot = booking.timeSlot || `${displayStart} - ...`;
+
+          html += `
+            <div class="booking-block ${pkgClass}" data-id="${booking.id}" title="${displayTitle} · ${displaySlot} · ${booking.players || 0} pers.">
+              <div class="block-title">${displayTitle}</div>
+              <div class="block-sub">
+                <span style="display:inline-flex; align-items:center; gap:3px; font-weight:600;">${icon('users', '', 11)} ${booking.players || 0}p</span>
+                <span style="opacity:0.85;">· ${displayStart}</span>
+              </div>
             </div>
-          </div>
-        `;
+          `;
+        });
+
+        html += `</div>`;
       });
-
-      html += `</div>`;
     });
-  });
 
-  gridEl.innerHTML = html;
+    gridEl.innerHTML = html;
 
-  // Attach click handler on booking blocks
-  gridEl.querySelectorAll('.booking-block').forEach(b => {
-    b.addEventListener('click', (e) => {
-      const id = e.currentTarget.dataset.id;
-      openBookingDetailModal(id);
+    // Attach click handler on booking blocks
+    gridEl.querySelectorAll('.booking-block').forEach(b => {
+      b.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const id = e.currentTarget.dataset.id;
+        openBookingDetailModal(id);
+      });
     });
-  });
+
+    // Attach click handler on empty cells to quick book
+    gridEl.querySelectorAll('.timeline-cell').forEach(cell => {
+      cell.addEventListener('click', (e) => {
+        if (e.target.closest('.booking-block')) return;
+        const resId = cell.dataset.res;
+        const hour = cell.dataset.hour;
+        const qbDateInput = document.getElementById('qb-date');
+        if (qbDateInput) qbDateInput.value = selectedDate;
+        openQuickBookingModal();
+      });
+    });
+  } catch (fatalErr) {
+    console.error('Fatal error in renderTimeline():', fatalErr);
+  }
 }
 
 // 2. BOOKINGS MASTER TABLE VIEW & BULK ACTIONS
@@ -1939,6 +1990,7 @@ window.newBookingForClient = (clientId) => {
 let currentReportsPeriod = 'all'; // 'all' | 'today' | 'weekend' | 'month'
 let currentReportsStatus = 'all'; // 'all' | 'confirmed' | 'pending'
 let currentReportsPackage = 'all'; // 'all' | 'fun' | 'vip' | 'sweet' | 'standard'
+let currentReportsArena = 'all'; // 'all' | 'jungle' | 'prison' | 'minigolf' | 'tables'
 
 function exportReportsToExcel() {
   const bookings = getFilteredReportsBookings();
@@ -2017,8 +2069,9 @@ function exportReportsToExcel() {
   const periodSlug = currentReportsPeriod;
   const statusSlug = currentReportsStatus !== 'all' ? `_${currentReportsStatus}` : '';
   const pkgSlug = currentReportsPackage !== 'all' ? `_${currentReportsPackage}` : '';
+  const arenaSlug = currentReportsArena !== 'all' ? `_${currentReportsArena}` : '';
   const todayStr = new Date().toISOString().split('T')[0];
-  link.setAttribute('download', `LaserMagic_Rapport_${periodSlug}${statusSlug}${pkgSlug}_${todayStr}.csv`);
+  link.setAttribute('download', `LaserMagic_Rapport_${periodSlug}${statusSlug}${pkgSlug}${arenaSlug}_${todayStr}.csv`);
   document.body.appendChild(link);
   link.click();
   document.body.removeChild(link);
@@ -2085,6 +2138,16 @@ function getFilteredReportsBookings() {
     list = list.filter(b => b.packageId === 'sweet');
   } else if (currentReportsPackage === 'standard') {
     list = list.filter(b => b.packageId && b.packageId.startsWith('standard'));
+  }
+
+  if (currentReportsArena === 'jungle') {
+    list = list.filter(b => (b.arena === 'jungle' || b.arena === 'combined' || !b.arena));
+  } else if (currentReportsArena === 'prison') {
+    list = list.filter(b => (b.arena === 'prison' || b.arena === 'combined'));
+  } else if (currentReportsArena === 'minigolf') {
+    list = list.filter(b => b.addons && b.addons.some(a => (a.id || '').toLowerCase().includes('golf')));
+  } else if (currentReportsArena === 'tables') {
+    list = list.filter(b => b.tableNumber || b.packageId);
   }
 
   return list;
@@ -2206,22 +2269,34 @@ function renderReportsView() {
 
   const extrasGrandTotal = addonStats.cake.total + addonStats.arcade.total + addonStats.laser.total + addonStats.minigolf.total + addonStats.drinks.total;
 
-  // Dynamic Arena Occupancy Metrics
-  const jungleBookings = bookings.filter(b => (b.arena || 'jungle') === 'jungle');
-  const prisonBookings = bookings.filter(b => b.arena === 'prison');
-  const minigolfBookings = bookings.filter(b => b.addons && b.addons.some(a => (a.id || '').toLowerCase().includes('golf')));
-  const tablesBookings = bookings.filter(b => b.tableNumber || b.packageId);
+  // Dynamic Arena Occupancy Metrics scoped by active period, status, and package filters
+  const arenaScopedBookings = periodBookings.filter(b => {
+    if (currentReportsStatus === 'confirmed' && b.status !== 'confirmed') return false;
+    if (currentReportsStatus === 'pending' && b.status === 'confirmed') return false;
+    if (currentReportsPackage === 'fun' && b.packageId !== 'fun') return false;
+    if (currentReportsPackage === 'vip' && b.packageId !== 'vip') return false;
+    if (currentReportsPackage === 'sweet' && b.packageId !== 'sweet') return false;
+    if (currentReportsPackage === 'standard' && !(b.packageId && b.packageId.startsWith('standard'))) return false;
+    return true;
+  });
+
+  const arenaBaseTotal = arenaScopedBookings.length || 1;
+  const jungleBookings = arenaScopedBookings.filter(b => (b.arena === 'jungle' || b.arena === 'combined' || !b.arena));
+  const prisonBookings = arenaScopedBookings.filter(b => (b.arena === 'prison' || b.arena === 'combined'));
+  const minigolfBookings = arenaScopedBookings.filter(b => b.addons && b.addons.some(a => (a.id || '').toLowerCase().includes('golf')));
+  const tablesBookings = arenaScopedBookings.filter(b => b.tableNumber || b.packageId);
 
   const junglePlayers = jungleBookings.reduce((s, b) => s + (b.players || 0), 0);
   const prisonPlayers = prisonBookings.reduce((s, b) => s + (b.players || 0), 0);
   const minigolfPlayers = minigolfBookings.reduce((s, b) => s + (b.players || 0), 0);
+  const tablesPlayers = tablesBookings.reduce((s, b) => s + (b.players || 0), 0);
 
-  const junglePct = bookings.length ? Math.min(100, Math.round((jungleBookings.length / bookings.length) * 100)) : 0;
-  const prisonPct = bookings.length ? Math.min(100, Math.round((prisonBookings.length / bookings.length) * 100)) : 0;
-  const minigolfPct = bookings.length ? Math.min(100, Math.round((minigolfBookings.length / bookings.length) * 100)) : 0;
-  const tablesPct = bookings.length ? Math.min(100, Math.round((tablesBookings.length / bookings.length) * 100)) : 0;
+  const junglePct = Math.min(100, Math.round((jungleBookings.length / arenaBaseTotal) * 100));
+  const prisonPct = Math.min(100, Math.round((prisonBookings.length / arenaBaseTotal) * 100));
+  const minigolfPct = Math.min(100, Math.round((minigolfBookings.length / arenaBaseTotal) * 100));
+  const tablesPct = Math.min(100, Math.round((tablesBookings.length / arenaBaseTotal) * 100));
 
-  const hasActiveFilters = currentReportsStatus !== 'all' || currentReportsPackage !== 'all';
+  const hasActiveFilters = currentReportsStatus !== 'all' || currentReportsPackage !== 'all' || currentReportsArena !== 'all';
 
   grid.innerHTML = `
     ${hasActiveFilters ? `
@@ -2236,6 +2311,12 @@ function renderReportsView() {
         ${currentReportsPackage !== 'all' ? `
           <span class="active-filter-tag" id="clear-package-tag" title="Supprimer ce filtre">
             <span>Formule: ${currentReportsPackage === 'fun' ? 'Fun' : (currentReportsPackage === 'vip' ? 'VIP' : (currentReportsPackage === 'sweet' ? 'Sweet' : 'Standard'))}</span>
+            <span style="font-size:1.15rem; line-height:1; font-weight:900;">&times;</span>
+          </span>
+        ` : ''}
+        ${currentReportsArena !== 'all' ? `
+          <span class="active-filter-tag" id="clear-arena-tag" title="Supprimer ce filtre">
+            <span>Arene: ${currentReportsArena === 'jungle' ? 'Jungle' : (currentReportsArena === 'prison' ? 'Prison' : (currentReportsArena === 'minigolf' ? 'Minigolf' : 'Tables'))}</span>
             <span style="font-size:1.15rem; line-height:1; font-weight:900;">&times;</span>
           </span>
         ` : ''}
@@ -2281,7 +2362,7 @@ function renderReportsView() {
             style="${currentReportsStatus === 'confirmed' ? 'opacity:0.35;' : 'opacity:1;'}" />
 
           <!-- Center Circle with Total Button -->
-          <g id="donut-center-btn" class="donut-center-btn" title="Cliquer pour reinitialiser le filtre statut">
+          <g id="donut-center-btn" class="donut-center-btn" title="Cliquer pour reinitialiser les filtres">
             <circle cx="120" cy="120" r="46" fill="#1e293b" />
             <text x="120" y="117" text-anchor="middle" font-size="28" font-weight="800" fill="#ffffff" font-family="'Plus Jakarta Sans', sans-serif">${bookings.length}</text>
             <text x="120" y="134" text-anchor="middle" font-size="8" font-weight="800" fill="#94a3b8" letter-spacing="1" font-family="'Plus Jakarta Sans', sans-serif">${t('centerReservationsLabel')}</text>
@@ -2390,7 +2471,7 @@ function renderReportsView() {
       </div>
     </div>
 
-    <!-- CARD 3: Taux d'Occupation des Arenes & Salles (Dynamically calculated) -->
+    <!-- CARD 3: Taux d'Occupation des Arenes & Salles (Clickable filters) -->
     <div class="report-card">
       <div class="report-card-head">
         <h3 class="report-card-title">${t('navCapacity')}</h3>
@@ -2399,61 +2480,73 @@ function renderReportsView() {
         </span>
       </div>
 
-      <div style="display:flex; flex-direction:column; gap:16px; margin-top:6px;">
-        <div class="gauge-item">
+      <div style="display:flex; flex-direction:column; gap:12px; margin-top:6px;">
+        <!-- Jungle -->
+        <div class="gauge-item report-interactive-item ${currentReportsArena === 'jungle' ? 'active' : ''}" data-arena="jungle"
+          style="cursor:pointer; padding:8px 10px; border-radius:12px; ${currentReportsArena !== 'all' && currentReportsArena !== 'jungle' ? 'opacity:0.35;' : 'opacity:1;'}"
+          title="Cliquer pour filtrer par Arène Jungle">
           <div class="gauge-head">
-            <span class="gauge-title">
+            <span class="gauge-title" style="display:inline-flex; align-items:center; gap:8px;">
               <span style="width:10px; height:10px; border-radius:50%; background:var(--laser-green); display:inline-block;"></span>
-              ${t('arenaJungle')}
+              <strong>${t('arenaJungle')}</strong>
             </span>
-            <span class="gauge-val" style="color:var(--laser-green);">${junglePct}% (${junglePlayers} pers.)</span>
+            <span class="gauge-val" style="color:var(--laser-green); font-weight:800;">${junglePct}% (${junglePlayers} pers.)</span>
           </div>
-          <div class="gauge-bar-track">
+          <div class="gauge-bar-track" style="margin-top:5px;">
             <div class="gauge-bar-fill" style="width:${junglePct}%; background:var(--laser-green);"></div>
           </div>
-          <div style="font-size:0.75rem; color:var(--text-muted);">${jungleBookings.length} sessions · 14:00 - 18:00</div>
+          <div style="font-size:0.75rem; color:var(--text-muted); margin-top:3px;">${jungleBookings.length} sessions · 14:00 - 18:00</div>
         </div>
 
-        <div class="gauge-item">
+        <!-- Prison -->
+        <div class="gauge-item report-interactive-item ${currentReportsArena === 'prison' ? 'active' : ''}" data-arena="prison"
+          style="cursor:pointer; padding:8px 10px; border-radius:12px; ${currentReportsArena !== 'all' && currentReportsArena !== 'prison' ? 'opacity:0.35;' : 'opacity:1;'}"
+          title="Cliquer pour filtrer par Arène Prison">
           <div class="gauge-head">
-            <span class="gauge-title">
+            <span class="gauge-title" style="display:inline-flex; align-items:center; gap:8px;">
               <span style="width:10px; height:10px; border-radius:50%; background:var(--laser-cyan); display:inline-block;"></span>
-              ${t('arenaPrison')}
+              <strong>${t('arenaPrison')}</strong>
             </span>
-            <span class="gauge-val" style="color:var(--laser-cyan);">${prisonPct}% (${prisonPlayers} pers.)</span>
+            <span class="gauge-val" style="color:var(--laser-cyan); font-weight:800;">${prisonPct}% (${prisonPlayers} pers.)</span>
           </div>
-          <div class="gauge-bar-track">
+          <div class="gauge-bar-track" style="margin-top:5px;">
             <div class="gauge-bar-fill" style="width:${prisonPct}%; background:var(--laser-cyan);"></div>
           </div>
-          <div style="font-size:0.75rem; color:var(--text-muted);">${prisonBookings.length} sessions · 16:00 - 20:00</div>
+          <div style="font-size:0.75rem; color:var(--text-muted); margin-top:3px;">${prisonBookings.length} sessions · 16:00 - 20:00</div>
         </div>
 
-        <div class="gauge-item">
+        <!-- Minigolf -->
+        <div class="gauge-item report-interactive-item ${currentReportsArena === 'minigolf' ? 'active' : ''}" data-arena="minigolf"
+          style="cursor:pointer; padding:8px 10px; border-radius:12px; ${currentReportsArena !== 'all' && currentReportsArena !== 'minigolf' ? 'opacity:0.35;' : 'opacity:1;'}"
+          title="Cliquer pour filtrer par Minigolf">
           <div class="gauge-head">
-            <span class="gauge-title">
+            <span class="gauge-title" style="display:inline-flex; align-items:center; gap:8px;">
               <span style="width:10px; height:10px; border-radius:50%; background:var(--laser-amber); display:inline-block;"></span>
-              ${t('facilityMinigolf')}
+              <strong>${t('facilityMinigolf')}</strong>
             </span>
-            <span class="gauge-val" style="color:var(--laser-amber);">${minigolfPct}% (${minigolfPlayers} pers.)</span>
+            <span class="gauge-val" style="color:var(--laser-amber); font-weight:800;">${minigolfPct}% (${minigolfPlayers} pers.)</span>
           </div>
-          <div class="gauge-bar-track">
+          <div class="gauge-bar-track" style="margin-top:5px;">
             <div class="gauge-bar-fill" style="width:${minigolfPct}%; background:var(--laser-amber);"></div>
           </div>
-          <div style="font-size:0.75rem; color:var(--text-muted);">${minigolfBookings.length} options Combo Laser + Minigolf</div>
+          <div style="font-size:0.75rem; color:var(--text-muted); margin-top:3px;">${minigolfBookings.length} options Combo Laser + Minigolf</div>
         </div>
 
-        <div class="gauge-item">
+        <!-- Espace Tables -->
+        <div class="gauge-item report-interactive-item ${currentReportsArena === 'tables' ? 'active' : ''}" data-arena="tables"
+          style="cursor:pointer; padding:8px 10px; border-radius:12px; ${currentReportsArena !== 'all' && currentReportsArena !== 'tables' ? 'opacity:0.35;' : 'opacity:1;'}"
+          title="Cliquer pour filtrer par Espace Tables">
           <div class="gauge-head">
-            <span class="gauge-title">
+            <span class="gauge-title" style="display:inline-flex; align-items:center; gap:8px;">
               <span style="width:10px; height:10px; border-radius:50%; background:var(--laser-pink); display:inline-block;"></span>
-              ${t('tablesArea')}
+              <strong>${t('tablesArea')}</strong>
             </span>
-            <span class="gauge-val" style="color:var(--laser-pink);">${tablesPct}%</span>
+            <span class="gauge-val" style="color:var(--laser-pink); font-weight:800;">${tablesPct}%</span>
           </div>
-          <div class="gauge-bar-track">
+          <div class="gauge-bar-track" style="margin-top:5px;">
             <div class="gauge-bar-fill" style="width:${tablesPct}%; background:var(--laser-pink);"></div>
           </div>
-          <div style="font-size:0.75rem; color:var(--text-muted);">${tablesBookings.length} tables assignees · Rotation 2h - 3h</div>
+          <div style="font-size:0.75rem; color:var(--text-muted); margin-top:3px;">${tablesBookings.length} tables assignees · Rotation 2h - 3h</div>
         </div>
       </div>
     </div>
@@ -2620,6 +2713,7 @@ function renderReportsView() {
     centerBtn.addEventListener('click', () => {
       currentReportsStatus = 'all';
       currentReportsPackage = 'all';
+      currentReportsArena = 'all';
       renderReportsView();
     });
   }
@@ -2649,6 +2743,15 @@ function renderReportsView() {
     };
   });
 
+  // Arena & facility rows click listeners
+  document.querySelectorAll('.gauge-item[data-arena]').forEach(item => {
+    item.onclick = (e) => {
+      const arena = e.currentTarget.dataset.arena;
+      currentReportsArena = (currentReportsArena === arena ? 'all' : arena);
+      renderReportsView();
+    };
+  });
+
   // Active filters banner listeners
   const clearStatusTag = document.getElementById('clear-status-tag');
   if (clearStatusTag) {
@@ -2664,11 +2767,19 @@ function renderReportsView() {
       renderReportsView();
     };
   }
+  const clearArenaTag = document.getElementById('clear-arena-tag');
+  if (clearArenaTag) {
+    clearArenaTag.onclick = () => {
+      currentReportsArena = 'all';
+      renderReportsView();
+    };
+  }
   const clearAllFiltersBtn = document.getElementById('clear-all-reports-filters');
   if (clearAllFiltersBtn) {
     clearAllFiltersBtn.onclick = () => {
       currentReportsStatus = 'all';
       currentReportsPackage = 'all';
+      currentReportsArena = 'all';
       renderReportsView();
     };
   }
