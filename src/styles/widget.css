@@ -1058,3 +1058,18 @@ body.widget-body {
     border-radius: var(--radius-lg);
   }
 }
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.spin-icon {
+  animation: spin 0.9s linear infinite;
+  display: inline-block;
+  vertical-align: middle;
+}
+
+.comp-suggest-item:hover {
+  background: rgba(0, 240, 255, 0.12) !important;
+}

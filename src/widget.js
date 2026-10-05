@@ -5,7 +5,7 @@ import { t, getLang, setLang, translations, formatMoney } from './i18n.js';
 import { store } from './store.js';
 import { icon } from './icons.js';
 import { getWhatsAppUrl, generateConfirmationEmailHtml, getClientPortalUrl } from './notifications.js';
-import { formatBelgianVat } from './companyLookup.js';
+import { formatBelgianVat, lookupViesOrKboCompany, searchEnterpriseSuggestions } from './companyLookup.js';
 
 // Global Widget State
 const state = {
@@ -749,6 +749,9 @@ function renderStep4() {
   const invVat = document.getElementById('input-invoice-vat');
   const invAddr = document.getElementById('input-invoice-address');
   const invPo = document.getElementById('input-invoice-po');
+  const vatStatus = document.getElementById('invoice-vat-status');
+  const vatCheckBtn = document.getElementById('btn-check-invoice-vat');
+  const compSuggestions = document.getElementById('invoice-company-suggestions');
 
   if (invChk && invBox) {
     invChk.checked = !!state.invoice.requested;
@@ -762,25 +765,200 @@ function renderStep4() {
     };
   }
 
-  if (invComp) {
-    invComp.value = state.invoice.companyName || '';
-    invComp.oninput = (e) => {
-      state.invoice.companyName = e.target.value;
+  // Real-time Automated VAT & Company Lookup (European VIES & Belgian BCE/KBO)
+  let vatLookupTimer = null;
+  const triggerVatLookup = async (forceOverwrite = false) => {
+    if (!invVat) return;
+    const rawVal = invVat.value.trim();
+    const cleanDigits = rawVal.replace(/[^A-Z0-9]/gi, '');
+    if (!cleanDigits || cleanDigits.length < 6) {
+      if (vatStatus) vatStatus.style.display = 'none';
+      return;
+    }
+
+    if (vatStatus) {
+      vatStatus.style.display = 'block';
+      vatStatus.style.background = 'rgba(0,240,255,0.06)';
+      vatStatus.style.borderColor = 'rgba(0,240,255,0.3)';
+      vatStatus.innerHTML = `
+        <span style="color:var(--laser-cyan); display:inline-flex; align-items:center; gap:6px;">
+          <svg class="spin-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg>
+          ${getLang() === 'nl' ? 'Bedrijfsgegevens ophalen via VIES / KBO...' : (getLang() === 'en' ? 'Fetching company details via VIES / BCE...' : 'Recherche automatique des données d\'entreprise (VIES UE / BCE)...')}
+        </span>
+      `;
+    }
+
+    const res = await lookupViesOrKboCompany(rawVal);
+    if (!res) return;
+
+    if (res.valid) {
+      // Auto-format VAT input
+      if (res.vatNumber) {
+        state.invoice.vatNumber = res.vatNumber;
+        invVat.value = res.vatNumber;
+      }
+      // Auto-fill company name if found
+      if (res.name && (forceOverwrite || !invComp.value || invComp.value === state.invoice.companyName)) {
+        state.invoice.companyName = res.name;
+        if (invComp) {
+          invComp.value = res.name;
+          invComp.style.borderColor = 'var(--laser-green)';
+          setTimeout(() => { if (invComp) invComp.style.borderColor = ''; }, 2500);
+        }
+      }
+      // Auto-fill billing address if found
+      if (res.address && (forceOverwrite || !invAddr.value || invAddr.value === state.invoice.billingAddress)) {
+        state.invoice.billingAddress = res.address;
+        if (invAddr) {
+          invAddr.value = res.address;
+          invAddr.style.borderColor = 'var(--laser-green)';
+          setTimeout(() => { if (invAddr) invAddr.style.borderColor = ''; }, 2500);
+        }
+      }
+
+      state.invoice.vatValidation = res;
+
+      // Update receipt summary on the right
       const receiptComp = document.getElementById('receipt-invoice-company-name');
-      if (receiptComp) receiptComp.textContent = e.target.value || (t('crmCorporate') || 'Société');
-    };
-  }
+      if (receiptComp) receiptComp.textContent = state.invoice.companyName || (t('crmCorporate') || 'Société');
+
+      if (vatStatus) {
+        vatStatus.style.display = 'block';
+        vatStatus.style.background = 'rgba(0,255,136,0.08)';
+        vatStatus.style.borderColor = 'rgba(0,255,136,0.35)';
+        vatStatus.innerHTML = `
+          <div style="display:flex; justify-content:space-between; align-items:center; gap:8px;">
+            <span style="color:var(--laser-green); font-weight:700; display:inline-flex; align-items:center; gap:6px;">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+              ${res.name ? res.name : (getLang() === 'nl' ? 'Gevalideerd BTW-nummer' : (getLang() === 'en' ? 'VAT Validated' : 'Numéro de TVA Validé'))}
+            </span>
+            <span style="font-size:0.72rem; color:var(--text-secondary); text-transform:uppercase;">${res.provider || 'VIES UE / BCE'}</span>
+          </div>
+        `;
+      }
+      notifyParentResize();
+    } else {
+      if (vatStatus) {
+        vatStatus.style.display = 'block';
+        vatStatus.style.background = 'rgba(255,27,123,0.08)';
+        vatStatus.style.borderColor = 'rgba(255,27,123,0.35)';
+        vatStatus.innerHTML = `
+          <span style="color:var(--laser-pink); display:inline-flex; align-items:center; gap:6px;">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+            ${getLang() === 'nl' ? 'BTW niet automatisch gevonden. U kan de velden handmatig invullen.' : (getLang() === 'en' ? 'VAT not found in VIES. You can enter details manually.' : 'Numéro non reconnu automatiquement par VIES. Vous pouvez compléter les champs manuellement.')}
+          </span>
+        `;
+        notifyParentResize();
+      }
+    }
+  };
 
   if (invVat) {
     invVat.value = state.invoice.vatNumber || '';
-    invVat.oninput = (e) => { state.invoice.vatNumber = e.target.value; };
-    invVat.onblur = (e) => {
-      const formatted = formatBelgianVat(e.target.value);
-      if (formatted) {
-        state.invoice.vatNumber = formatted;
-        invVat.value = formatted;
+    invVat.oninput = (e) => {
+      state.invoice.vatNumber = e.target.value;
+      clearTimeout(vatLookupTimer);
+      const cleanVal = e.target.value.replace(/[^A-Z0-9]/gi, '');
+      if (cleanVal.length >= 8) {
+        vatLookupTimer = setTimeout(() => triggerVatLookup(false), 600);
       }
     };
+    invVat.onblur = () => {
+      triggerVatLookup(false);
+    };
+  }
+
+  if (vatCheckBtn) {
+    vatCheckBtn.onclick = (e) => {
+      e.preventDefault();
+      triggerVatLookup(true);
+    };
+  }
+
+  // Company Name input with auto-suggestions dropdown
+  if (invComp) {
+    invComp.value = state.invoice.companyName || '';
+    let compDebounce = null;
+
+    invComp.oninput = (e) => {
+      const q = e.target.value;
+      state.invoice.companyName = q;
+      const receiptComp = document.getElementById('receipt-invoice-company-name');
+      if (receiptComp) receiptComp.textContent = q || (t('crmCorporate') || 'Société');
+
+      if (!compSuggestions) return;
+      clearTimeout(compDebounce);
+      compDebounce = setTimeout(() => {
+        if (!q || q.trim().length < 2) {
+          compSuggestions.style.display = 'none';
+          compSuggestions.innerHTML = '';
+          return;
+        }
+
+        const matches = searchEnterpriseSuggestions(q);
+        if (!matches || matches.length === 0) {
+          compSuggestions.style.display = 'none';
+          compSuggestions.innerHTML = '';
+          return;
+        }
+
+        compSuggestions.innerHTML = matches.map(m => `
+          <div class="comp-suggest-item" data-vat="${m.vatNumber}" data-name="${m.name}" data-addr="${m.street}, ${m.postalCode} ${m.city} (${m.countryName})" style="padding:10px 14px; cursor:pointer; border-bottom:1px solid rgba(255,255,255,0.06); transition:background var(--transition-fast);">
+            <div style="font-weight:700; font-size:0.88rem; color:#ffffff;">${m.name}</div>
+            <div style="font-size:0.75rem; color:var(--laser-cyan); margin-top:2px; display:flex; justify-content:space-between;">
+              <span>${m.vatNumber}</span>
+              <span style="color:var(--text-secondary);">${m.city} (${m.countryName})</span>
+            </div>
+          </div>
+        `).join('');
+
+        compSuggestions.style.display = 'block';
+
+        compSuggestions.querySelectorAll('.comp-suggest-item').forEach(item => {
+          item.onclick = (ev) => {
+            ev.stopPropagation();
+            const chosenName = item.dataset.name;
+            const chosenVat = item.dataset.vat;
+            const chosenAddr = item.dataset.addr;
+
+            state.invoice.companyName = chosenName;
+            state.invoice.vatNumber = chosenVat;
+            state.invoice.billingAddress = chosenAddr;
+
+            if (invComp) invComp.value = chosenName;
+            if (invVat) invVat.value = chosenVat;
+            if (invAddr) invAddr.value = chosenAddr;
+
+            compSuggestions.style.display = 'none';
+            compSuggestions.innerHTML = '';
+
+            if (receiptComp) receiptComp.textContent = chosenName;
+            if (vatStatus) {
+              vatStatus.style.display = 'block';
+              vatStatus.style.background = 'rgba(0,255,136,0.08)';
+              vatStatus.style.borderColor = 'rgba(0,255,136,0.35)';
+              vatStatus.innerHTML = `
+                <div style="display:flex; justify-content:space-between; align-items:center;">
+                  <span style="color:var(--laser-green); font-weight:700; display:inline-flex; align-items:center; gap:6px;">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+                    ${chosenName}
+                  </span>
+                  <span style="font-size:0.72rem; color:var(--text-secondary); text-transform:uppercase;">BCE / KBO & VIES</span>
+                </div>
+              `;
+            }
+            notifyParentResize();
+          };
+        });
+      }, 200);
+    };
+
+    // Close suggestions when clicking outside
+    document.addEventListener('click', (ev) => {
+      if (compSuggestions && !compSuggestions.contains(ev.target) && ev.target !== invComp) {
+        compSuggestions.style.display = 'none';
+      }
+    });
   }
 
   if (invAddr) {

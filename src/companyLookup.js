@@ -214,14 +214,45 @@ export function validateBelgianVatModulo(cleanVatDigits) {
   return check === last2;
 }
 
+const EU_COUNTRIES = {
+  BE: "Belgique",
+  NL: "Pays-Bas",
+  FR: "France",
+  LU: "Luxembourg",
+  DE: "Allemagne",
+  ES: "Espagne",
+  IT: "Italie",
+  AT: "Autriche",
+  PT: "Portugal",
+  IE: "Irlande",
+  PL: "Pologne",
+  SE: "Suède",
+  DK: "Danemark",
+  FI: "Finlande",
+  CZ: "République Tchèque",
+  RO: "Roumanie",
+  HU: "Hongrie",
+  GR: "Grèce",
+  EL: "Grèce",
+  BG: "Bulgarie",
+  HR: "Croatie",
+  CY: "Chypre",
+  EE: "Estonie",
+  LT: "Lituanie",
+  LV: "Lettonie",
+  MT: "Malte",
+  SK: "Slovaquie",
+  SI: "Slovénie"
+};
+
 /**
- * Real-time Company & VAT Lookup (VIES & KBO/BCE)
+ * Real-time Company & VAT Lookup (VIES European Commission & KBO/BCE)
  */
 export async function lookupViesOrKboCompany(query) {
   if (!query || query.trim().length < 2) return null;
   const qClean = query.trim().toUpperCase().replace(/[^A-Z0-9]/g, '');
 
-  // 1. Direct check in curated verified registry by VAT or Name
+  // 1. Direct check in curated verified registry by VAT or Name (0ms cache)
   const matchByVat = VERIFIED_ENTERPRISE_REGISTRY.find(e => 
     e.cleanVat === qClean || 
     e.enterpriseNumber.replace(/[^0-9]/g, '') === qClean ||
@@ -230,7 +261,9 @@ export async function lookupViesOrKboCompany(query) {
   if (matchByVat) {
     return {
       valid: true,
+      status: "TVA Valide (BCE / KBO & VIES)",
       ...matchByVat,
+      address: `${matchByVat.street}, ${matchByVat.postalCode} ${matchByVat.city} (${matchByVat.countryName})`,
       checkedAt: new Date().toISOString(),
       provider: "VIES (Commission Européenne) & BCE / KBO"
     };
@@ -243,90 +276,128 @@ export async function lookupViesOrKboCompany(query) {
   if (matchByName) {
     return {
       valid: true,
+      status: "TVA Valide (BCE / KBO & VIES)",
       ...matchByName,
+      address: `${matchByName.street}, ${matchByName.postalCode} ${matchByName.city} (${matchByName.countryName})`,
       checkedAt: new Date().toISOString(),
       provider: "VIES (Commission Européenne) & BCE / KBO"
     };
   }
 
-  // 2. If it looks like a VAT number, attempt live VIES REST API
-  const isVatFormat = qClean.startsWith('BE') || qClean.startsWith('NL') || /^[0-9]{9,10}$/.test(qClean);
-  if (isVatFormat) {
-    let country = 'BE';
-    let vatDigits = qClean;
-    if (qClean.startsWith('NL')) {
-      country = 'NL';
-      vatDigits = qClean.substring(2);
-    } else if (qClean.startsWith('BE')) {
-      country = 'BE';
-      vatDigits = qClean.substring(2);
-    }
-    if (country === 'BE' && vatDigits.length === 9) {
-      vatDigits = '0' + vatDigits;
-    }
+  // 2. Parse country code and VAT digits (European Union)
+  let country = 'BE';
+  let vatDigits = qClean;
+  const twoLetters = qClean.substring(0, 2);
+  if (EU_COUNTRIES[twoLetters] || /^[A-Z]{2}$/.test(twoLetters)) {
+    country = twoLetters;
+    vatDigits = qClean.substring(2);
+  } else if (/^[0-9]{9,10}$/.test(qClean)) {
+    country = 'BE';
+    vatDigits = qClean.length === 9 ? ('0' + qClean) : qClean;
+  }
 
-    try {
-      const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 2500);
-      const res = await fetch(`https://ec.europa.eu/taxation_customs/vies/rest-api/ms/${country}/vat/${vatDigits}`, {
-        signal: controller.signal
-      });
-      clearTimeout(timeoutId);
+  const fullVat = country + vatDigits;
 
-      if (res.ok) {
-        const data = await res.json();
-        if (data && data.isValid) {
-          // Parse address returned by VIES
-          const addr = (data.address || '').split('\n').filter(Boolean);
-          const street = addr[0] || '';
-          const cityLine = addr[1] || '';
-          const postMatch = cityLine.match(/([0-9]{4,5})\s*(.*)/);
+  // 3. Live Query Tier 1: CORS-friendly VIES JSON Gateway (returns registered name + address)
+  try {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 3500);
+    const res = await fetch(`https://api.vatcomply.com/vat?vat_number=${fullVat}`, {
+      signal: controller.signal
+    });
+    clearTimeout(timeoutId);
 
-          return {
-            valid: true,
-            vatNumber: formatBelgianVat(country + vatDigits),
-            cleanVat: country + vatDigits,
-            enterpriseNumber: vatDigits,
-            name: data.name || `Entreprise ${vatDigits}`,
-            tradeName: (data.name || '').split(' ')[0],
-            street: street,
-            postalCode: postMatch ? postMatch[1] : '',
-            city: postMatch ? postMatch[2] : cityLine,
-            country: country,
-            countryName: country === 'BE' ? 'Belgique' : 'Pays-Bas',
-            checkedAt: new Date().toISOString(),
-            provider: "VIES (API Directe Commission Européenne)"
-          };
-        }
-      }
-    } catch (e) {
-      // VIES might be unreachable from browser CORS or timeout; graceful fallback
-    }
-
-    // Mathematical Modulo 97 validation for Belgian VAT
-    if (country === 'BE' && vatDigits.length === 10) {
-      const isValidModulo = validateBelgianVatModulo(vatDigits);
-      if (isValidModulo) {
+    if (res.ok) {
+      const data = await res.json();
+      if (data && data.valid && data.name && data.name !== '---') {
+        const lines = (data.address || '').split('\n').map(s => s.trim()).filter(Boolean);
+        const address = lines.join(', ');
+        const countryName = EU_COUNTRIES[country] || data.country_code || country;
         return {
           valid: true,
-          vatNumber: formatBelgianVat('BE' + vatDigits),
-          cleanVat: 'BE' + vatDigits,
-          enterpriseNumber: `${vatDigits.substring(0, 4)}.${vatDigits.substring(4, 7)}.${vatDigits.substring(7, 10)}`,
-          name: `Société #${vatDigits.substring(0, 4)} (Vérifiée BCE)`,
-          tradeName: `Société ${vatDigits.substring(0, 4)}`,
-          street: "Adresse à préciser",
-          postalCode: "1000",
-          city: "Bruxelles",
-          country: "BE",
-          countryName: "Belgique",
+          status: "TVA Valide (VIES UE / BCE)",
+          vatNumber: country === 'BE' ? formatBelgianVat(fullVat) : `${country} ${vatDigits}`,
+          cleanVat: fullVat,
+          enterpriseNumber: vatDigits,
+          name: data.name,
+          tradeName: data.name.split(' ')[0],
+          address: address ? `${address} (${countryName})` : '',
+          street: lines[0] || '',
+          city: lines[1] || '',
+          country: country,
+          countryName: countryName,
           checkedAt: new Date().toISOString(),
-          provider: "Algorithme Modulo 97 (KBO / BCE Officiel)"
+          provider: "VIES (Commission Européenne) & BCE"
         };
       }
     }
+  } catch (e) {
+    // Continue to official direct VIES REST API
   }
 
-  return null;
+  // 4. Live Query Tier 2: Official European Commission VIES REST API
+  try {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 3000);
+    const res = await fetch(`https://ec.europa.eu/taxation_customs/vies/rest-api/ms/${country}/vat/${vatDigits}`, {
+      signal: controller.signal
+    });
+    clearTimeout(timeoutId);
+
+    if (res.ok) {
+      const data = await res.json();
+      if (data && data.isValid && data.name && data.name !== '---') {
+        const addr = (data.address || '').split('\n').map(s => s.trim()).filter(Boolean);
+        const address = addr.join(', ');
+        const countryName = EU_COUNTRIES[country] || country;
+        return {
+          valid: true,
+          status: "TVA Valide (VIES UE Direct)",
+          vatNumber: country === 'BE' ? formatBelgianVat(fullVat) : `${country} ${vatDigits}`,
+          cleanVat: fullVat,
+          enterpriseNumber: vatDigits,
+          name: data.name,
+          tradeName: data.name.split(' ')[0],
+          address: address ? `${address} (${countryName})` : '',
+          street: addr[0] || '',
+          city: addr[1] || '',
+          country: country,
+          countryName: countryName,
+          checkedAt: new Date().toISOString(),
+          provider: "VIES (API Directe Commission Européenne)"
+        };
+      }
+    }
+  } catch (e) {
+    // Continue to modulo check
+  }
+
+  // 5. Mathematical Modulo 97 validation for Belgian VAT
+  if (country === 'BE' && vatDigits.length === 10) {
+    const isValidModulo = validateBelgianVatModulo(vatDigits);
+    if (isValidModulo) {
+      const formattedBelgian = formatBelgianVat('BE' + vatDigits);
+      return {
+        valid: true,
+        status: "TVA Belge Valide (Structure BCE)",
+        vatNumber: formattedBelgian,
+        cleanVat: 'BE' + vatDigits,
+        enterpriseNumber: `${vatDigits.substring(0, 4)}.${vatDigits.substring(4, 7)}.${vatDigits.substring(7, 10)}`,
+        name: "",
+        address: "",
+        country: "BE",
+        countryName: "Belgique",
+        checkedAt: new Date().toISOString(),
+        provider: "Algorithme Modulo 97 (KBO / BCE Officiel)"
+      };
+    }
+  }
+
+  return {
+    valid: false,
+    status: "Numéro de TVA non trouvé ou invalide",
+    cleanVat: fullVat
+  };
 }
 
 /**
