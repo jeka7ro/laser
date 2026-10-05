@@ -2848,6 +2848,11 @@ function openBookingDetailModal(id) {
               <span class="order-num">N° ${String(b.orderNumber || 42).padStart(3, '0')}</span>
             </div>
             <span class="badge" style="background:rgba(0,240,255,0.15); color:var(--laser-cyan); border:1px solid rgba(0,240,255,0.3); font-weight:700;">#${b.id}</span>
+            ${(b.invoiceRequested || b.companyName || b.isCorporate) ? `
+              <span class="badge" style="background:rgba(0,240,255,0.18); color:var(--laser-cyan); border:1px solid rgba(0,240,255,0.4); font-weight:800; display:inline-flex; align-items:center; gap:4px; font-size:0.72rem;">
+                ${icon('fileText', 'text-cyan', 13)} FACTURE DEMANDÉE
+              </span>
+            ` : ''}
             <span class="badge" style="background:rgba(255,255,255,0.08); color:var(--text-white); border:1px solid var(--border-medium); font-weight:800; font-size:0.72rem; text-transform:uppercase; display:inline-flex; align-items:center; gap:6px; border-radius:var(--radius-full); padding:2px 8px 2px 3px;">${getRoundFlagSvg(b.lang || 'fr', 16)} <span>${(b.lang || 'fr').toUpperCase()}</span></span>
           </div>
           <p style="color:var(--text-secondary); font-size:0.85rem; margin:4px 0 0 0;">Créé le ${new Date(b.createdAt).toLocaleString('fr-BE')}</p>
@@ -2950,7 +2955,36 @@ function openBookingDetailModal(id) {
           Aucun extra optionnel sélectionné sur ce dossier.
         </div>
       `}
-    </div>
+    ${(b.invoiceRequested || b.companyName || b.isCorporate) ? `
+      <!-- Corporate & Invoice Details -->
+      <div class="glass-panel" style="padding:14px 18px; margin-bottom:16px; border-radius:18px; border:1px solid rgba(0,240,255,0.35); background:rgba(0,240,255,0.04);">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+          <div style="font-size:0.8rem; color:var(--laser-cyan); text-transform:uppercase; font-weight:800; display:flex; align-items:center; gap:8px;">
+            ${icon('fileText', 'text-cyan', 16)}
+            <span>Facturation Société / Professionnel</span>
+          </div>
+          <span class="badge" style="background:rgba(0,240,255,0.15); color:var(--laser-cyan); font-weight:800; font-size:0.72rem;">FACTURE PROFESSIONNELLE</span>
+        </div>
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px;">
+          <div>
+            <div style="font-size:0.75rem; color:var(--text-muted); text-transform:uppercase; font-weight:700;">Nom de la société / Raison sociale</div>
+            <strong style="font-size:1.05rem; color:#fff; display:block; margin-top:2px;">${b.companyName || '-'}</strong>
+            <div style="font-size:0.82rem; color:var(--text-secondary); margin-top:4px;">
+              Numéro de TVA / Entreprise : <strong style="color:var(--laser-cyan);">${b.vatNumber || '-'}</strong>
+            </div>
+          </div>
+          <div>
+            <div style="font-size:0.75rem; color:var(--text-muted); text-transform:uppercase; font-weight:700;">Adresse de facturation</div>
+            <div style="font-size:0.9rem; color:#fff; margin-top:2px;">${b.billingAddress || '-'}</div>
+            ${b.poNumber ? `
+              <div style="font-size:0.82rem; color:var(--laser-pink); margin-top:4px;">
+                Réf. Bon de commande (PO) : <strong>${b.poNumber}</strong>
+              </div>
+            ` : ''}
+          </div>
+        </div>
+      </div>
+    ` : ''}
 
     <!-- 2 Columns: Client Organisateur & Créneau -->
     <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-bottom:16px;">

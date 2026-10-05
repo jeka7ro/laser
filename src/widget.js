@@ -5,6 +5,7 @@ import { t, getLang, setLang, translations, formatMoney } from './i18n.js';
 import { store } from './store.js';
 import { icon } from './icons.js';
 import { getWhatsAppUrl, generateConfirmationEmailHtml, getClientPortalUrl } from './notifications.js';
+import { formatBelgianVat } from './companyLookup.js';
 
 // Global Widget State
 const state = {
@@ -31,6 +32,13 @@ const state = {
     phone: '',
     notes: '',
     termsAgreed: true
+  },
+  invoice: {
+    requested: false,
+    companyName: '',
+    vatNumber: '',
+    billingAddress: '',
+    poNumber: ''
   },
   paymentMethod: 'bancontact', // 'bancontact', 'payconiq', 'stripe', 'onsite'
   depositMode: '30', // '30' or '100'
@@ -734,6 +742,57 @@ function renderStep4() {
   if (phoneInp) phoneInp.oninput = (e) => { state.organizer.phone = e.target.value; };
   if (notesInp) notesInp.oninput = (e) => { state.organizer.notes = e.target.value; };
 
+  // Invoice toggle and fields wiring
+  const invChk = document.getElementById('input-request-invoice');
+  const invBox = document.getElementById('invoice-details-fields');
+  const invComp = document.getElementById('input-invoice-company');
+  const invVat = document.getElementById('input-invoice-vat');
+  const invAddr = document.getElementById('input-invoice-address');
+  const invPo = document.getElementById('input-invoice-po');
+
+  if (invChk && invBox) {
+    invChk.checked = !!state.invoice.requested;
+    invBox.style.display = state.invoice.requested ? 'block' : 'none';
+
+    invChk.onchange = (e) => {
+      state.invoice.requested = e.target.checked;
+      invBox.style.display = state.invoice.requested ? 'block' : 'none';
+      renderStep4();
+      notifyParentResize();
+    };
+  }
+
+  if (invComp) {
+    invComp.value = state.invoice.companyName || '';
+    invComp.oninput = (e) => {
+      state.invoice.companyName = e.target.value;
+      const receiptComp = document.getElementById('receipt-invoice-company-name');
+      if (receiptComp) receiptComp.textContent = e.target.value || (t('crmCorporate') || 'Société');
+    };
+  }
+
+  if (invVat) {
+    invVat.value = state.invoice.vatNumber || '';
+    invVat.oninput = (e) => { state.invoice.vatNumber = e.target.value; };
+    invVat.onblur = (e) => {
+      const formatted = formatBelgianVat(e.target.value);
+      if (formatted) {
+        state.invoice.vatNumber = formatted;
+        invVat.value = formatted;
+      }
+    };
+  }
+
+  if (invAddr) {
+    invAddr.value = state.invoice.billingAddress || '';
+    invAddr.oninput = (e) => { state.invoice.billingAddress = e.target.value; };
+  }
+
+  if (invPo) {
+    invPo.value = state.invoice.poNumber || '';
+    invPo.oninput = (e) => { state.invoice.poNumber = e.target.value; };
+  }
+
   // Calculate totals
   const pkgPrice = state.selectedPackage ? state.selectedPackage.price : 24;
   const packageSubtotal = state.playersCount * pkgPrice;
@@ -821,6 +880,15 @@ function renderStep4() {
           <span>${formatMoney(a.total)}</span>
         </div>
       `).join('')}
+      ${state.invoice.requested ? `
+        <div class="summary-row" style="background:rgba(0,240,255,0.06); padding:8px 10px; border-radius:8px; margin:8px 0; border:1px solid rgba(0,240,255,0.22); align-items:center;">
+          <div style="display:flex; align-items:center; gap:6px; color:var(--laser-cyan); font-weight:700; font-size:0.82rem;">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+            <span>${t('invoiceRequestedBadge') || 'Facture demandée'}</span>
+          </div>
+          <span id="receipt-invoice-company-name" style="font-size:0.8rem; font-weight:600; color:#ffffff; max-width:130px; text-overflow:ellipsis; overflow:hidden; white-space:nowrap;">${state.invoice.companyName || (t('crmCorporate') || 'Société')}</span>
+        </div>
+      ` : ''}
       <div class="summary-divider"></div>
       <div class="summary-row">
         <span>${deposit > 0 ? (state.depositMode === '100' ? t('depositChoice100') : t('depositToPayNow')) : t('payOnSiteOption')} :</span>
@@ -893,6 +961,38 @@ function submitBooking() {
   const name = state.organizer.name.trim() || "Client Laser Magic";
   const email = state.organizer.email.trim() || "reservation@lasermagic.be";
   const phone = state.organizer.phone.trim() || "+32 470 00 00 00";
+
+  // If invoice requested, validate company details
+  if (state.invoice.requested) {
+    const compInp = document.getElementById('input-invoice-company');
+    const vatInp = document.getElementById('input-invoice-vat');
+    const addrInp = document.getElementById('input-invoice-address');
+
+    if (!state.invoice.companyName.trim()) {
+      if (compInp) {
+        compInp.focus();
+        compInp.style.borderColor = 'var(--laser-pink)';
+      }
+      alert(getLang() === 'nl' ? 'Gelieve de bedrijfsnaam in te vullen voor de factuur.' : (getLang() === 'en' ? 'Please enter the company name for your invoice.' : 'Veuillez renseigner le nom de la société pour la facturation.'));
+      return;
+    }
+    if (!state.invoice.vatNumber.trim()) {
+      if (vatInp) {
+        vatInp.focus();
+        vatInp.style.borderColor = 'var(--laser-pink)';
+      }
+      alert(getLang() === 'nl' ? 'Gelieve het btw-nummer in te vullen voor de factuur.' : (getLang() === 'en' ? 'Please enter the VAT number for your invoice.' : 'Veuillez renseigner le numéro de TVA pour la facturation.'));
+      return;
+    }
+    if (!state.invoice.billingAddress.trim()) {
+      if (addrInp) {
+        addrInp.focus();
+        addrInp.style.borderColor = 'var(--laser-pink)';
+      }
+      alert(getLang() === 'nl' ? 'Gelieve het facturatieadres in te vullen.' : (getLang() === 'en' ? 'Please enter the full billing address.' : 'Veuillez renseigner l\'adresse complète de facturation.'));
+      return;
+    }
+  }
 
   const pkgPrice = state.selectedPackage ? state.selectedPackage.price : 26;
   const packageSubtotal = state.playersCount * pkgPrice;
@@ -976,6 +1076,12 @@ function submitBooking() {
     paymentStatus: deposit >= grandTotal ? 'paid_full' : (deposit > 0 ? 'deposit_paid' : 'pending_onsite'),
     status: deposit > 0 ? 'confirmed' : 'pending',
     specialNotes: state.organizer.notes,
+    isCorporate: !!state.invoice.requested,
+    invoiceRequested: !!state.invoice.requested,
+    companyName: state.invoice.requested ? state.invoice.companyName.trim() : '',
+    vatNumber: state.invoice.requested ? state.invoice.vatNumber.trim() : '',
+    billingAddress: state.invoice.requested ? state.invoice.billingAddress.trim() : '',
+    poNumber: state.invoice.requested ? state.invoice.poNumber.trim() : '',
     communicationLog: [
       {
         id: 'comm-init-email',
@@ -1040,6 +1146,17 @@ function renderSuccessScreen(booking) {
             <span style="color:var(--text-secondary);">${t('totalAmount')} :</span>
             <strong style="color:var(--text-white); font-size:1.25rem;">${formatMoney(booking.totalAmount)}</strong>
           </div>
+          ${booking.invoiceRequested || booking.companyName ? `
+          <div style="background:rgba(0,240,255,0.06); border:1px solid rgba(0,240,255,0.22); border-radius:var(--radius-md); padding:12px; margin-top:14px;">
+            <div style="font-size:0.8rem; font-weight:700; color:var(--laser-cyan); display:flex; align-items:center; gap:6px; margin-bottom:6px;">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+              <span>${t('invoiceRequestedBadge') || 'Facture demandée'}</span>
+            </div>
+            <div style="font-size:0.88rem; color:#fff; font-weight:700;">${booking.companyName}</div>
+            ${booking.vatNumber ? `<div style="font-size:0.8rem; color:var(--text-secondary); margin-top:2px;">TVA : <strong style="color:var(--text-white);">${booking.vatNumber}</strong></div>` : ''}
+            ${booking.billingAddress ? `<div style="font-size:0.8rem; color:var(--text-secondary); margin-top:2px;">${booking.billingAddress}</div>` : ''}
+            ${booking.poNumber ? `<div style="font-size:0.8rem; color:var(--laser-pink); margin-top:2px;">PO : ${booking.poNumber}</div>` : ''}
+          </div>` : ''}
         </div>
       </div>
     `;

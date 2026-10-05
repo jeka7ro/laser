@@ -170,7 +170,12 @@ export function generateConfirmationEmailHtml(booking, lang = null, origin = win
       addressTitle: `Accès & Recommandations`,
       addressText: `Laser Magic · Schaarbeeklei 26, 1800 Vilvoorde (Parking gratuit disponible)`,
       recomText: `Arrivez 15 minutes en avance pour le briefing de sécurité. Chaussures plates fermées indispensables pour tous les enfants.`,
-      footerRights: `© 2026 Laser Magic. Tous droits réservés.`
+      footerRights: `© 2026 Laser Magic. Tous droits réservés.`,
+      invoiceTitle: `Coordonnées de facturation (B2B)`,
+      invoiceCompanyLabel: `Société`,
+      invoiceVatLabel: `N° TVA / Entreprise`,
+      invoiceAddressLabel: `Adresse de facturation`,
+      invoicePoLabel: `Réf. Bon de commande (PO)`
     },
     nl: {
       subject: `Bevestiging van uw reservatie Laser Magic #${booking.id}`,
@@ -194,7 +199,12 @@ export function generateConfirmationEmailHtml(booking, lang = null, origin = win
       addressTitle: `Toegang & Aanbevelingen`,
       addressText: `Laser Magic · Schaarbeeklei 26, 1800 Vilvoorde (Gratis parking beschikbaar)`,
       recomText: `Gelieve 15 minuten vooraf aanwezig te zijn voor de veiligheidsbriefing. Gesloten schoenen verplicht voor alle kinderen.`,
-      footerRights: `© 2026 Laser Magic. Alle rechten voorbehouden.`
+      footerRights: `© 2026 Laser Magic. Alle rechten voorbehouden.`,
+      invoiceTitle: `Facturatiegegevens (B2B)`,
+      invoiceCompanyLabel: `Bedrijf`,
+      invoiceVatLabel: `Btw-nummer`,
+      invoiceAddressLabel: `Facturatieadres`,
+      invoicePoLabel: `Bestelbon ref.`
     },
     en: {
       subject: `Confirmation of your Laser Magic booking #${booking.id}`,
@@ -218,7 +228,12 @@ export function generateConfirmationEmailHtml(booking, lang = null, origin = win
       addressTitle: `Venue & Guidelines`,
       addressText: `Laser Magic · Schaarbeeklei 26, 1800 Vilvoorde (Free parking on-site)`,
       recomText: `Please arrive 15 minutes early for the briefing. Closed athletic shoes are mandatory for all players.`,
-      footerRights: `© 2026 Laser Magic. All rights reserved.`
+      footerRights: `© 2026 Laser Magic. All rights reserved.`,
+      invoiceTitle: `Invoice details (B2B)`,
+      invoiceCompanyLabel: `Company`,
+      invoiceVatLabel: `VAT number`,
+      invoiceAddressLabel: `Billing address`,
+      invoicePoLabel: `PO Reference`
     }
   }[effectiveLang] || {};
 
@@ -308,6 +323,30 @@ export function generateConfirmationEmailHtml(booking, lang = null, origin = win
           <span class="row-val">${payMethodText}</span>
         </div>
       </div>
+
+      ${(booking.invoiceRequested || booking.companyName) ? `
+      <div class="card" style="border:1px solid rgba(0,240,255,0.3); background:#0c1c38;">
+        <div style="font-weight:700; color:#00f0ff; font-size:15px; margin-bottom:12px;">${t.invoiceTitle}</div>
+        <div class="row">
+          <span class="row-label">${t.invoiceCompanyLabel}</span>
+          <span class="row-val">${booking.companyName || '-'}</span>
+        </div>
+        ${booking.vatNumber ? `
+        <div class="row">
+          <span class="row-label">${t.invoiceVatLabel}</span>
+          <span class="row-val" style="color:#00f0ff;">${booking.vatNumber}</span>
+        </div>` : ''}
+        ${booking.billingAddress ? `
+        <div class="row">
+          <span class="row-label">${t.invoiceAddressLabel}</span>
+          <span class="row-val">${booking.billingAddress}</span>
+        </div>` : ''}
+        ${booking.poNumber ? `
+        <div class="row">
+          <span class="row-label">${t.invoicePoLabel}</span>
+          <span class="row-val" style="color:#ff1b7b;">${booking.poNumber}</span>
+        </div>` : ''}
+      </div>` : ''}
 
       <div class="cta-wrap">
         <a href="${confirmUrl}" class="btn-cta" target="_blank">${t.btnConfirm}</a>
